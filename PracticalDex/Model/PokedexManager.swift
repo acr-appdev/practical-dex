@@ -6,7 +6,7 @@
 //  Copyright © 2020 Allan Rosa. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 protocol PokedexManagerDelegate {
 	// The delegate pattern protocol's requirements
@@ -22,7 +22,7 @@ struct PokedexManager {
 	
 	// Method that returns the API URL for querying
 	func createQueryURL(name: String = "") -> String {
-		let url = "https://pokeapi.co/api/v2/pokemon/\(name)#"
+		let url = "https://pokeapi.co/api/v2/pokemon/\(name)"
 		return url
 	}
 	func createQueryURL(limit: Int, offset: Int = 0) -> String{
@@ -32,8 +32,7 @@ struct PokedexManager {
 	
 	func fetchPokemon(name: String){
 		let url = createQueryURL(name: name)
-		//		 print("Fetching by city name:")
-		//		 print(url)
+		print(url)
 		performRequest(with: url)
 	}
 	
@@ -63,15 +62,30 @@ struct PokedexManager {
 		}
 	}
 	
-	// Method that decodes the JSON data returned by the OWM's API, returning a WeatherModel object
+	// Method that decodes the JSON data returned by PokeAPI
 	func parseJSON(_ pokemonData: Data) -> Pokemon? {
 		let decoder = JSONDecoder() // initialize the JSONDecoder object
 		do {
 			let decodedData = try decoder.decode(PokemonData.self, from: pokemonData)
+			
+			// Translate the decoded JSON data to fill our Model attributes
 			let name = decodedData.name
 			let number = decodedData.id
-			
-			let pokemon = Pokemon(name: name, number: number)
+	
+			var defaultSprite = UIImage()
+			if let imageURL = URL(string: decodedData.sprites.front_default){
+				print(imageURL)
+				if let imageData = try? Data(contentsOf: imageURL){
+					print("I got this data: \(imageData)")
+					defaultSprite = UIImage(data: imageData, scale: 10)!
+				} else {
+					defaultSprite = #imageLiteral(resourceName: "Missingno.")
+					print("Elsed zzz")
+				}
+			}
+			let sprites = SpriteImages(normal: defaultSprite)
+			// Finally, return the new object
+			let pokemon = Pokemon(name: name, number: number, sprites: sprites)
 			
 			return pokemon
 			
@@ -83,5 +97,3 @@ struct PokedexManager {
 		}
 	}
 }
-
-

@@ -22,21 +22,30 @@ struct PokemonData: Decodable {
 	let name: String
 	// let order: Int
 	// let species: Specie
-	// let sprites: Sprites
+	let sprites: Sprites
 	// let stats: [Stats]
 	// let types: [Type]
 	// let weight: Int
-	
-	
 }
 
-private struct Stats: Decodable {
-	let base_stat: Int
-	let effort: Int
-	let stat: Stat
-}
+//private struct Stats: Decodable {
+//	let base_stat: Int
+//	let effort: Int
+//	let stat: Stat
+//}
+//
+//private struct Stat: Decodable {
+//	let name: String
+//	let url: String
+//}
 
-private struct Stat: Decodable {
-	let name: String
-	let url: String
+struct Sprites: Decodable {
+//	let back_default: String
+//	let back_female: String?
+//	let back_shiny: String
+//	let back_shiny_female: String?
+	let front_default: String
+//	let front_female: String?
+//	let front_shiny: String
+//	let front_shiny_female: String?
 }

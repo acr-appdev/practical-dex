@@ -17,12 +17,12 @@ class PokedexViewCell: UICollectionViewCell {
 		
 		self.layer.cornerRadius = 10
 		
-		//nameLabel.text = String(format: "%03d", pokemon.number)
-		//nameLabel.text?.append(" - \(pokemon.name)")
-		nameLabel.text = pokemon.name
+		nameLabel.text = String(format: "%03d", pokemon.number)
+		nameLabel.text?.append(" - \(pokemon.name.capitalized)")
+		//nameLabel.text = pokemon.name
 		nameLabel.backgroundColor = .blue
 		nameLabel.textColor = .white
-		spriteImageView.image = #imageLiteral(resourceName: "Missingno.")
+		spriteImageView.image = pokemon.sprites.normal
 		
 		self.backgroundColor = UIColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 0.5)
 			

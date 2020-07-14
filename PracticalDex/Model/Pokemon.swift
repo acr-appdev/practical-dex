@@ -6,11 +6,12 @@
 //  Copyright © 2020 Allan Rosa. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 struct Pokemon {
 	let name: String
 	let number: Int
+	let sprites: SpriteImages
 //	let type1: Type
 //	let type2: Type?
 //	let ability1: String
@@ -24,4 +25,8 @@ struct Pokemon {
 //		let SpD: Int
 //		let Spe: Int
 //	}
+}
+
+struct SpriteImages {
+	let normal: UIImage
 }

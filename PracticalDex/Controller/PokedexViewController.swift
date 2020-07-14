@@ -8,19 +8,35 @@
 
 import UIKit
 
-class PokedexViewController: UICollectionViewController {
+class PokedexViewController: UICollectionViewController, PokedexManagerDelegate {
+	func didUpdatePokedex(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
+		// Using DispatchQueue because the data comes from networking, so the app isn't frozen
 
-	private let pokedexData = [Pokemon(name: "Bulbasaur", number: 1),
-							   Pokemon(name: "Magmar", number: 126),
-							   Pokemon(name: "Ivysaur", number: 2),
-							   Pokemon(name: "Venusaur", number: 3),
-							   Pokemon(name: "Squirtle", number: 4),
-							   Pokemon(name: "Wartortle", number: 5),
-							   Pokemon(name: "Blastoise", number: 6),
-							   Pokemon(name: "Charmander", number: 7)]
+		DispatchQueue.main.async {
+			self.pokedexData.append(pokemon)
+			self.pokedexData = self.pokedexData.sorted(by: {$0.number < $1.number})
+			self.collectionView.reloadData()
+		}
+	}
+	
+	func didFailWithError(error: Error) {
+		// do stuff
+	}
+	
+	private var pokedexData: [Pokemon] = []
+	
+	private var pokedexManager = PokedexManager()
 	
     override func viewDidLoad() {
         super.viewDidLoad()
+		
+		pokedexManager.delegate = self
+		pokedexManager.fetchPokemon(name: "ivysaur")
+		pokedexManager.fetchPokemon(name: "venusaur")
+		pokedexManager.fetchPokemon(name: "bulbasaur")
+		pokedexManager.fetchPokemon(name: "pikachu")
+		pokedexManager.fetchPokemon(name: "raichu")
+		
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -47,7 +63,6 @@ class PokedexViewController: UICollectionViewController {
         // #warning Incomplete implementation, return the number of sections
 		return 1
     }
-
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of items
@@ -112,7 +127,7 @@ extension PokedexViewController: UICollectionViewDelegateFlowLayout{
 	
 	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 		
-		let numberOfColumns: CGFloat = 3
+		let numberOfColumns: CGFloat = 2
 		let totalWidth = view.frame.width
 		let totalOffsetSpace: CGFloat = 32// in points
 		let pokedexCellWidth = (totalWidth - totalOffsetSpace) / numberOfColumns
