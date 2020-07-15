@@ -22,10 +22,8 @@ class PokedexViewCell: UICollectionViewCell {
 		//nameLabel.text = pokemon.name
 		nameLabel.backgroundColor = .blue
 		nameLabel.textColor = .white
-		spriteImageView.image = pokemon.sprites.normal
+		spriteImageView.image = pokemon.sprites.male
 		
 		self.backgroundColor = UIColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 0.5)
-			
-		print("The cell for \(nameLabel.text!) was set")
 	}
 }

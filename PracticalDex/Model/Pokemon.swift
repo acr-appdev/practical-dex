@@ -25,8 +25,32 @@ struct Pokemon {
 //		let SpD: Int
 //		let Spe: Int
 //	}
+	
+	init(withData pkmnData: PokemonData){
+		name = pkmnData.name
+		number = pkmnData.id
+		
+		var defaultSprite = #imageLiteral(resourceName: "Missingno.")
+		if let imageURL = URL(string: pkmnData.sprites.front_default){
+			// TODO: Probably should fire this code from a DispatchQueue Async
+			if let imageData = try? Data(contentsOf: imageURL){
+				//print("I got this data: \(imageData)")
+				defaultSprite = UIImage(data: imageData)!
+			}
+		}
+		sprites = SpriteImages(male: defaultSprite)
+	}
 }
 
 struct SpriteImages {
-	let normal: UIImage
+	let male: UIImage
+	// let female: UIImage
+	// let shinyMale: UIImage
+	// let shinyFemale: UIImage
+	// let male_back: UIImage
+	// let female_back: UIImage
+	// let shinyMale_back: UIImage
+	// let shinyFemale_back: UIImage
 }
+
+

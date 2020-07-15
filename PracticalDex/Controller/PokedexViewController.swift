@@ -9,7 +9,7 @@
 import UIKit
 
 class PokedexViewController: UICollectionViewController, PokedexManagerDelegate {
-	func didUpdatePokedex(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
+	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
 		// Using DispatchQueue because the data comes from networking, so the app isn't frozen
 
 		DispatchQueue.main.async {
@@ -31,12 +31,18 @@ class PokedexViewController: UICollectionViewController, PokedexManagerDelegate 
         super.viewDidLoad()
 		
 		pokedexManager.delegate = self
-		pokedexManager.fetchPokemon(name: "ivysaur")
-		pokedexManager.fetchPokemon(name: "venusaur")
-		pokedexManager.fetchPokemon(name: "bulbasaur")
-		pokedexManager.fetchPokemon(name: "pikachu")
-		pokedexManager.fetchPokemon(name: "raichu")
-		
+		pokedexManager.fetchPokemon(byName: "ivysaur")
+		pokedexManager.fetchPokemon(byName: "venusaur")
+		pokedexManager.fetchPokemon(byName: "bulbasaur")
+		pokedexManager.fetchPokemon(byName: "pikachu")
+		pokedexManager.fetchPokemon(byName: "raichu")
+		pokedexManager.fetchPokemon(byName: "aerodactyl")
+		pokedexManager.fetchPokemon(byName: "unown")
+		pokedexManager.fetchPokemon(byName: "rayquaza")
+		pokedexManager.fetchPokemon(byName: "pidgeot")
+		pokedexManager.fetchPokemon(byName: "pidgey")
+		pokedexManager.fetchPokemon(byName: "vibrava")
+		pokedexManager.fetchPokemon(byName: "quilava")
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
