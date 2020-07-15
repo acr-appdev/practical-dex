@@ -9,6 +9,15 @@
 import UIKit
 
 class PokedexViewController: UICollectionViewController, PokedexManagerDelegate {
+	func didUpdatePokedex(_ pokedexManager: PokedexManager, entries: [Pokemon]) {
+		DispatchQueue.main.async {
+			self.pokedexData.append(contentsOf: entries)
+			
+			self.pokedexData = self.pokedexData.sorted(by: {$0.number < $1.number})
+			self.collectionView.reloadData()
+		}
+	}
+	
 	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
 		// Using DispatchQueue because the data comes from networking, so the app isn't frozen
 
@@ -31,18 +40,19 @@ class PokedexViewController: UICollectionViewController, PokedexManagerDelegate 
         super.viewDidLoad()
 		
 		pokedexManager.delegate = self
-		pokedexManager.fetchPokemon(byName: "ivysaur")
-		pokedexManager.fetchPokemon(byName: "venusaur")
-		pokedexManager.fetchPokemon(byName: "bulbasaur")
-		pokedexManager.fetchPokemon(byName: "pikachu")
-		pokedexManager.fetchPokemon(byName: "raichu")
-		pokedexManager.fetchPokemon(byName: "aerodactyl")
-		pokedexManager.fetchPokemon(byName: "unown")
-		pokedexManager.fetchPokemon(byName: "rayquaza")
-		pokedexManager.fetchPokemon(byName: "pidgeot")
-		pokedexManager.fetchPokemon(byName: "pidgey")
-		pokedexManager.fetchPokemon(byName: "vibrava")
-		pokedexManager.fetchPokemon(byName: "quilava")
+		pokedexManager.populatePokedex(entriesLimit: 151, offset: 0)
+//		pokedexManager.fetchPokemon(byName: "ivysaur")
+//		pokedexManager.fetchPokemon(byName: "venusaur")
+//		pokedexManager.fetchPokemon(byName: "bulbasaur")
+//		pokedexManager.fetchPokemon(byName: "pikachu")
+//		pokedexManager.fetchPokemon(byName: "raichu")
+//		pokedexManager.fetchPokemon(byName: "aerodactyl")
+//		pokedexManager.fetchPokemon(byName: "unown")
+//		pokedexManager.fetchPokemon(byName: "rayquaza")
+//		pokedexManager.fetchPokemon(byName: "pidgeot")
+//		pokedexManager.fetchPokemon(byName: "pidgey")
+//		pokedexManager.fetchPokemon(byName: "vibrava")
+//		pokedexManager.fetchPokemon(byName: "quilava")
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
