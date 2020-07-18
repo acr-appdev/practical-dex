@@ -12,9 +12,7 @@ protocol PokedexManagerDelegate {
 	// The delegate pattern protocol's requirements
 	// didRetrievePokemon: Who updated the pokedex? What is the updated data?
 	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon)
-	func didUpdatePokedex(_ pokedexManager: PokedexManager, entries: [Pokemon])
-	
-	func didFailWithError(error: Error)
+	func didFailWithError(_ error: Error)
 }
 
 // Manages Pokedex entries and handles calls to PokeAPI (https://pokeapi.co/api/v2)
@@ -30,6 +28,7 @@ struct PokedexManager {
 				//pokemonEntries.forEach( {(pkmn) in print(pkmn.name)} )
 				case .failure(let error):
 					print("Failed to fetch pokemon by name (\(name)): ", error)
+					self.delegate?.didFailWithError(error)
 			}
 		}
 	}
@@ -70,6 +69,7 @@ struct PokedexManager {
 				//pokemonEntries.forEach( {(pkmn) in print(pkmn.name)} )
 				case .failure(let error):
 					print("Failed to populate pokedex using limit=\(limit)&offset=\(offset) ", error)
+					self.delegate?.didFailWithError(error)
 			}
 		}
 	}

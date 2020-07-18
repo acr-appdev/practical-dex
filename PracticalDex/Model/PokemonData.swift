@@ -10,22 +10,48 @@
 import Foundation
 
 struct PokemonData: Decodable {
-	// let abilities: [Ability]
+	let abilities: [AbilityAttribute]
 	// let base_experience: Int
 	// let forms: [Form]
 	// let game_indices
-	// let height: Int
+	let height: Int
 	let id: Int // number
 	// let is_default: Boolean
 	// let location_area_encounters:
 	// let moves: [Move]
 	let name: String
 	// let order: Int
-	// let species: Specie
+	//let species: SpeciesData
 	let sprites: Sprites
 	// let stats: [Stats]
-	// let types: [Type]
-	// let weight: Int
+	let types: [TypeData]
+	let weight: Int
+}
+
+struct AbilityAttribute: Decodable {
+	let ability: AbilityData
+	
+	let is_hidden: Bool
+	let slot: Int
+}
+
+struct AbilityData: Decodable {
+	let name: String
+	//let resourceURL: String
+}
+
+struct TypeData: Decodable {
+	let slot: Int
+	let type: TypeAttribute
+}
+struct TypeAttribute: Decodable {
+	let name: String
+	// let resourceURL: String // not used
+}
+
+struct SpeciesData: Decodable {
+	let name: String
+	let resourceURL: String
 }
 
 //private struct Stats: Decodable {

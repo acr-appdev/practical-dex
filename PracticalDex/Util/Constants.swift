@@ -34,6 +34,7 @@ struct K {
 		}
 		struct View {
 			static let pokedexCell = "pokedexCell"
+			static let segueDetailView = "goToDetailView"
 		}
 		
 	}
@@ -63,4 +64,5 @@ enum Type {
 	case Dark
 	case Steel
 	case Fairy
+	case None
 }
