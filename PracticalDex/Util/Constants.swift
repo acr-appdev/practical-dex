@@ -33,14 +33,24 @@ struct K {
 			
 		}
 		struct View {
-			static let pokedexCell = "pokedexCell"
-			static let segueDetailView = "goToDetailView"
+			struct Segue {
+				static let detailView = "goToDetailView"
+				static let infoPageView = "goToInfoPageView"
+			}
+			struct Cell {
+				static let pokedex = "PokedexCell"
+			}
+			static let infoPageVC = "InfoPageViewController"
+			static let aboutVC = "AboutVC"
+			static let evolutionVC = "EvolutionVC"
+			static let movesVC = "MovesVC"
+			static let statsVC = "StatsVC"
 		}
 		
 	}
 	struct Content {
 		struct Label {
-			
+			static let loremIpsum = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged."
 		}
 	}
 }

@@ -8,9 +8,7 @@
 
 import UIKit
 
-class DetailViewController: UIViewController {
-
-	var pokemon = Pokemon()
+class DetailViewController: PokemonViewController {
 	
 	@IBOutlet weak var spriteImageView: UIImageView!
 	@IBOutlet weak var primaryTypeLabel: UILabel!
@@ -21,25 +19,45 @@ class DetailViewController: UIViewController {
 	@IBOutlet weak var ability1Label: UILabel!
 	@IBOutlet weak var ability2Label: UILabel!
 	@IBOutlet weak var ability3Label: UILabel!
+	@IBOutlet weak var infoContainerView: UIView!
+	
 	
 	override func viewDidLoad() {
-        super.viewDidLoad()
-
-		setupInterface(with: pokemon)
-		// not working
-		let swipeLeft: UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(DetailViewController.swipeLeft))
-		swipeLeft.direction = .left
-		self.view!.addGestureRecognizer(swipeLeft)
-        
-    }
-    
+		super.viewDidLoad()
+		
+		configure(with: pokemon)
+		configurePageViewController(for: pokemon)
+		
+	}
+	private func configurePageViewController(for pkmn: Pokemon){
+		
+	}
 	
-	private func setupInterface(with pokemon: Pokemon){
+	private func configure(with pokemon: Pokemon){
+		
 		spriteImageView.image = pokemon.sprites.male
+		
+		configureTypeLabels(with: pokemon)
+		
+		nameLabel.text = pokemon.name.capitalized
+		nameLabel.roundedEdges()
+		numberLabel.text = "#\(pokemon.number)"
+		numberLabel.roundedEdges()
+		
+		configureAbilityLabels(with: pokemon.abilities)
+		
+		// set generaLabel
+		
+	}
+	
+	// MARK: - configureTypeLabels
+	private func configureTypeLabels(with pokemon: Pokemon){
+		
 		primaryTypeLabel.text = "\(pokemon.primaryType)"
 		primaryTypeLabel.roundedEdges()
 		primaryTypeLabel.backgroundColor = colorSelector(for: pokemon.primaryType)
-//		switch the types to set the label background color
+		//		switch the types to set the label background color
+		
 		if pokemon.secondaryType != nil {
 			secondaryTypeLabel.text = "\(pokemon.secondaryType!)"
 			secondaryTypeLabel.backgroundColor = colorSelector(for: pokemon.secondaryType!)
@@ -47,71 +65,79 @@ class DetailViewController: UIViewController {
 		} else {
 			secondaryTypeLabel.isHidden = true
 		}
-		
-		nameLabel.text = pokemon.name.capitalized
-		nameLabel.roundedEdges()
-		numberLabel.text = "#\(pokemon.number)"
-		numberLabel.roundedEdges()
-		
-		if pokemon.abilities.count < 3{
+	}
+	
+	// MARK: configureAbilityLabels
+	private func configureAbilityLabels(with abilities: [Ability]){
+		if abilities.count < 3{
 			ability2Label.isHidden = true
 			ability3Label.isHidden = true
 		}
-		//print(pokemon.abilities)
-		pokemon.abilities.forEach({ ability in
+		
+		abilities.forEach({ ability in
 			switch ability.slot {
 				case 1:
-					ability1Label.text = ability.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
+					ability1Label.text = ability.name
 					ability1Label.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
 					ability1Label.roundedEdges()
-					if ability.is_hidden {
-						ability1Label.font = ability1Label.font.bold()
+					if ability.isHidden {
+						ability1Label.font = UIFont.boldSystemFont(ofSize: ability1Label.font.pointSize)
+					} else {
+						ability1Label.font = UIFont.systemFont(ofSize: ability1Label.font.pointSize)
 				}
+				
 				case 2:
-					ability2Label.text = ability.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
-
+					ability2Label.text = ability.name
 					ability2Label.backgroundColor = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 1)
 					ability2Label.roundedEdges()
 					ability2Label.isHidden = false
-					if ability.is_hidden {
-						self.ability2Label.font = ability2Label.font.bold()
+					
+					if ability.isHidden {
+						ability2Label.font = UIFont.boldSystemFont(ofSize: ability2Label.font.pointSize)
+					} else {
+						ability2Label.font = UIFont.systemFont(ofSize: ability2Label.font.pointSize)
 				}
+				
 				case 3:
-					ability3Label.text = ability.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
+					ability3Label.text = ability.name
 					ability3Label.backgroundColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
 					ability3Label.roundedEdges()
 					ability3Label.isHidden = false
-					if ability.is_hidden {
-						self.ability3Label.font = ability3Label.font.bold()
+					
+					if ability.isHidden {
+						ability3Label.font = UIFont.boldSystemFont(ofSize: ability3Label.font.pointSize)
+					} else {
+						ability3Label.font = UIFont.systemFont(ofSize: ability3Label.font.pointSize)
 				}
+				
 				default:
 					print("Error Setting up AbilityLabels")
-				}
-			})
-		
-		
-		// set generaLabel
-		
+			}
+		})
 	}
-
+	
+	
+	// MARK: - IBActions
 	@IBAction func backButtonPressed(_ sender: UIButton) {
 		self.dismiss(animated: true, completion: nil)
 	}
 	
-	// not working
-	@objc private func swipeLeft(gestureRecognizer: UISwipeGestureRecognizer){
-		print("swipeLeft to Return triggered")
-		self.dismiss(animated: true, completion: nil)
-	}
+	// MARK: - Navigation
 	
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		switch segue.identifier {
+			case K.App.View.Segue.infoPageView:
+				let destinationVC = segue.destination as! InfoPageViewController
+				destinationVC.pokemon = pokemon
+			default:
+				break
+		}
+		
+		
+		// pass the selected cell pokemon
+		
+		//print("I passed \(selectedPokemon.name.capitalized)")
+	}
 }
+
+

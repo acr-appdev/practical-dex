@@ -51,6 +51,15 @@ func colorSelector(for type: Type) -> UIColor{
 	}
 }
 
+// should implement a gradient return later
+func colorSelector(for stat: Int) -> UIColor {
+	if 0...60 ~= stat { return .red }
+	if 61...85 ~= stat { return .orange }
+	if 86...100 ~= stat { return .yellow }
+	if 100...999 ~= stat { return .green }
+	else { return .gray }
+}
+
 extension UILabel {
 	func roundedEdges(withSize size: CGFloat = 10.0){
 		self.clipsToBounds = true
@@ -59,13 +68,12 @@ extension UILabel {
 }
 
 extension UIFont {
-	func withTraits(traits: UIFontDescriptor.SymbolicTraits...) -> UIFont {
-		let descriptor = self.fontDescriptor.withSymbolicTraits(UIFontDescriptor.SymbolicTraits(traits))
-		return UIFont(descriptor: descriptor!, size: 0)
-	}
-	
-	func bold() -> UIFont {
-		return withTraits(traits: .traitBold)
+	func toggleBold(isBold: Bool) -> UIFont {
+		if isBold {
+			return UIFont.systemFont(ofSize: self.pointSize)
+		} else {
+			return UIFont.boldSystemFont(ofSize: self.pointSize)
+		}
 	}
 }
 

@@ -74,7 +74,7 @@ struct PokedexManager {
 		}
 	}
 	
-	fileprivate func fetchPokemonDataJSON(limit: Int, offset: Int, completion: @escaping (Result<[PokemonResource], Error>) -> ()) {
+	fileprivate func fetchPokemonDataJSON(limit: Int, offset: Int, completion: @escaping (Result<[NamedAPIResource], Error>) -> ()) {
 		
 		guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=\(limit)&offset=\(offset)") else { return }
 		

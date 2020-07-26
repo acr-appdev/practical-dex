@@ -10,11 +10,11 @@
 import Foundation
 
 struct PokemonData: Decodable {
-	let abilities: [AbilityAttribute]
+	let abilities: [AbilityData]
 	// let base_experience: Int
 	// let forms: [Form]
 	// let game_indices
-	let height: Int
+	let height: Int // in decimeters (1dm = 0.1m)
 	let id: Int // number
 	// let is_default: Boolean
 	// let location_area_encounters:
@@ -23,47 +23,36 @@ struct PokemonData: Decodable {
 	// let order: Int
 	//let species: SpeciesData
 	let sprites: Sprites
-	// let stats: [Stats]
+	let stats: [StatsData]
 	let types: [TypeData]
-	let weight: Int
+	let weight: Int // in hectograms (1hg = 100g = 0.1kg)
 }
 
-struct AbilityAttribute: Decodable {
-	let ability: AbilityData
-	
+struct AbilityData: Decodable {
+	let ability: NamedAPIResource
 	let is_hidden: Bool
 	let slot: Int
 }
 
-struct AbilityData: Decodable {
+struct NamedAPIResource: Decodable {
 	let name: String
-	//let resourceURL: String
+	let url: String
+}
+
+struct UnnamedAPIResource: Decodable {
+	let url: String
 }
 
 struct TypeData: Decodable {
 	let slot: Int
-	let type: TypeAttribute
-}
-struct TypeAttribute: Decodable {
-	let name: String
-	// let resourceURL: String // not used
+	let type: NamedAPIResource
 }
 
-struct SpeciesData: Decodable {
-	let name: String
-	let resourceURL: String
+struct StatsData: Decodable {
+	let base_stat: Int
+	let effort: Int
+	let stat: NamedAPIResource
 }
-
-//private struct Stats: Decodable {
-//	let base_stat: Int
-//	let effort: Int
-//	let stat: Stat
-//}
-//
-//private struct Stat: Decodable {
-//	let name: String
-//	let url: String
-//}
 
 struct Sprites: Decodable {
 //	let back_default: String
