@@ -21,16 +21,10 @@ class DetailViewController: PokemonViewController {
 	@IBOutlet weak var ability3Label: UILabel!
 	@IBOutlet weak var infoContainerView: UIView!
 	
-	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
 		configure(with: pokemon)
-		configurePageViewController(for: pokemon)
-		
-	}
-	private func configurePageViewController(for pkmn: Pokemon){
-		
 	}
 	
 	private func configure(with pokemon: Pokemon){

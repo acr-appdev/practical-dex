@@ -74,7 +74,7 @@ class PokedexViewController: UICollectionViewController, PokedexManagerDelegate 
 	// MARK: UICollectionViewDelegate
 	override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let pokemon = pokedexData[indexPath.row]
-		print("I selected \(pokemon.name.capitalized)")
+		//print("I selected \(pokemon.name.capitalized)")
 		selectedPokemon = pokemon
 		
 		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)

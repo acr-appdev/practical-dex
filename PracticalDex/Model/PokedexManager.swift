@@ -21,9 +21,13 @@ struct PokedexManager {
 	var delegate: PokedexManagerDelegate?
 	
 	func fetchPokemon(byName name: String){
-		fetchPokemonDataJSON(byName: name) { (result) in
+		let urlString = "https://pokeapi.co/api/v2/pokemon/\(name)"
+		
+		fetchGenericData(urlString: urlString){ (result: Result<PokemonData, Error>) in
+			
 			switch result {
-				case .success(let pkmn):
+				case .success(let pkmnData):
+					let pkmn = Pokemon(withData: pkmnData)
 					self.delegate?.didRetrievePokemon(self, pokemon: pkmn)
 				//pokemonEntries.forEach( {(pkmn) in print(pkmn.name)} )
 				case .failure(let error):
@@ -33,40 +37,15 @@ struct PokedexManager {
 		}
 	}
 	
-	fileprivate func fetchPokemonDataJSON(byName name: String, completion: @escaping (Result<Pokemon, Error>) -> ()) {
-		
-		guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon/\(name)") else { return }
-		
-		URLSession.shared.dataTask(with: url) { (data, resp, err) in
-			
-			if let err = err {
-				completion(.failure(err))
-				return
-			}
-			// Successfully retrieved data
-			do {
-				let pokemonDecodedData = try JSONDecoder().decode(PokemonData.self, from: data!)
-				//pokemonDecodedData.forEach({pkmnData in
-				//	let newEntry = Pokemon(withData: pkmnData)
-				//	pkmnEntries.append(newEntry)
-				// })
-				let pkmn = Pokemon(withData: pokemonDecodedData)
-				completion(.success(pkmn))
-				
-			} catch let jsonError {
-				completion(.failure(jsonError))
-			}
-		}.resume()
-	}
-	
 	func populatePokedex(entriesLimit limit: Int, offset: Int){
-		fetchPokemonDataJSON(limit: limit, offset: offset){ (result) in
+		let urlString = "https://pokeapi.co/api/v2/pokemon?limit=\(limit)&offset=\(offset)"
+		
+		fetchGenericData(urlString: urlString){ (result: Result<MultiplePokemonData, Error>) in
 			switch result {
-				case .success(let pkmnResources):
-					pkmnResources.forEach({ pkmn in
+				case .success(let data):
+					data.results.forEach({ pkmn in
 						self.fetchPokemon(byName: pkmn.name)
 					})
-				//pokemonEntries.forEach( {(pkmn) in print(pkmn.name)} )
 				case .failure(let error):
 					print("Failed to populate pokedex using limit=\(limit)&offset=\(offset) ", error)
 					self.delegate?.didFailWithError(error)
@@ -74,25 +53,21 @@ struct PokedexManager {
 		}
 	}
 	
-	fileprivate func fetchPokemonDataJSON(limit: Int, offset: Int, completion: @escaping (Result<[NamedAPIResource], Error>) -> ()) {
-		
-		guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=\(limit)&offset=\(offset)") else { return }
-		
+	fileprivate func fetchGenericData<T: Decodable>(urlString: String, completion: @escaping (Result<T, Error>) -> ()) {
+		guard let url = URL(string: urlString) else { return }
 		URLSession.shared.dataTask(with: url) { (data, resp, err) in
-			
 			if let err = err {
 				completion(.failure(err))
 				return
 			}
-			// Successfully retrieved data
 			do {
-				let pokemonResourcesData = try JSONDecoder().decode(MultiplePokemonData.self, from: data!)
-
-				completion(.success(pokemonResourcesData.results))
+				let decodedData = try JSONDecoder().decode(T.self, from: data!)
+				completion(.success(decodedData))
 				
 			} catch let jsonError {
 				completion(.failure(jsonError))
 			}
 		}.resume()
 	}
+	
 }

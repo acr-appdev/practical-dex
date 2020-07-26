@@ -21,7 +21,7 @@ struct PokemonData: Decodable {
 	// let moves: [Move]
 	let name: String
 	// let order: Int
-	//let species: SpeciesData
+	let species: NamedAPIResource
 	let sprites: Sprites
 	let stats: [StatsData]
 	let types: [TypeData]
