@@ -30,6 +30,7 @@
 		ACC4169D24BF74B200CCDC22 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACC4169C24BF74B200CCDC22 /* DetailViewController.swift */; };
 		ACE4654424CBA8FE0063A02C /* PokemonSpeciesData.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE4654324CBA8FE0063A02C /* PokemonSpeciesData.swift */; };
 		ACE4654624CCD3650063A02C /* BezierProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE4654524CCD3650063A02C /* BezierProgressBar.swift */; };
+		ACF9F30A24CE60A8004B0BB0 /* PokemonSpecies.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACF9F30924CE60A8004B0BB0 /* PokemonSpecies.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +59,7 @@
 		ACC4169C24BF74B200CCDC22 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		ACE4654324CBA8FE0063A02C /* PokemonSpeciesData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonSpeciesData.swift; sourceTree = "<group>"; };
 		ACE4654524CCD3650063A02C /* BezierProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezierProgressBar.swift; sourceTree = "<group>"; };
+		ACF9F30924CE60A8004B0BB0 /* PokemonSpecies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonSpecies.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 			children = (
 				ACE4654224CBA8BA0063A02C /* API Models */,
 				AC03EEE024BA5912002DE350 /* Pokemon.swift */,
+				ACF9F30924CE60A8004B0BB0 /* PokemonSpecies.swift */,
 				AC03EEE624BA7437002DE350 /* PokedexManager.swift */,
 			);
 			path = Model;
@@ -252,6 +255,7 @@
 				ACB25FF924BCCA940006E634 /* PokedexViewCell.swift in Sources */,
 				ACE4654424CBA8FE0063A02C /* PokemonSpeciesData.swift in Sources */,
 				AC03EEE924BA745D002DE350 /* PokemonData.swift in Sources */,
+				ACF9F30A24CE60A8004B0BB0 /* PokemonSpecies.swift in Sources */,
 				AC16947524C8A0FF00F7C8B4 /* MovesViewController.swift in Sources */,
 				AC16947724C8A11100F7C8B4 /* EvolutionViewController.swift in Sources */,
 				ACE4654624CCD3650063A02C /* BezierProgressBar.swift in Sources */,

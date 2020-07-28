@@ -9,18 +9,18 @@
 
 import Foundation
 
-struct PokemonSpeciesData {
+struct PokemonSpeciesData: Decodable {
 	let base_happiness: Int
 	let capture_rate: Int
 	let color: NamedAPIResource
 	let egg_groups: [NamedAPIResource]
 	let evolution_chain: UnnamedAPIResource
 	// let evolves_from_species: EvolvesFromSpeciesData
-	let flavor_text_entries: [NamedAPIResource]
+	let flavor_text_entries: [FlavorTextData]
 	//let form_descriptions: [FormDescriptionsData]
 	let forms_switchable: Bool
 	let gender_rate: Int // in octaves (gender_rate/8 gives the male/female ratio, -1 = genderless)
-	let genera: GeneraData
+	let genera: [GeneraData]
 	let generation: NamedAPIResource
 	let growth_rate: NamedAPIResource
 	//let habitat:
@@ -37,19 +37,26 @@ struct PokemonSpeciesData {
 	//let varieties": [1 item]
 }
 
-struct NameData {
+struct NameData: Decodable {
 	let language: NamedAPIResource
 	let name: String
 }
 
-struct FlavorTextData {
+struct FlavorTextData: Decodable {
 	let flavor_text: String
 	let language: NamedAPIResource
 	let version: NamedAPIResource
 	
 }
 
-struct GeneraData {
+struct GeneraData: Decodable {
 	let genus: String
 	let language: NamedAPIResource
+}
+
+struct MultiplePokemonData: Decodable {
+	let count: Int
+	let next: String?
+	let previous: String?
+	let results: [NamedAPIResource]
 }

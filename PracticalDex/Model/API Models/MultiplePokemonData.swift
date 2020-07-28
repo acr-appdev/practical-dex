@@ -9,9 +9,4 @@
 
 import Foundation
 
-struct MultiplePokemonData: Decodable {
-	let count: Int
-	let next: String?
-	let previous: String?
-	let results: [NamedAPIResource]
-}
+
