@@ -30,12 +30,16 @@ class DetailViewController: PokemonViewController {
 	private func configure(with pokemon: Pokemon){
 		
 		spriteImageView.image = pokemon.sprites.male
+		spriteImageView.layer.borderWidth = 1
+		spriteImageView.layer.borderColor = CGColor(srgbRed: 0, green: 0, blue: 0, alpha: 1)
+		spriteImageView.layer.cornerRadius = 10
+		spriteImageView.clipsToBounds = true
 		
 		configureTypeLabels(with: pokemon)
 		
 		nameLabel.text = pokemon.name.capitalized
 		nameLabel.roundedEdges()
-		numberLabel.text = "#\(pokemon.number)"
+		numberLabel.text = "#\(String(format: "%03d", pokemon.number))"
 		numberLabel.roundedEdges()
 		
 		configureAbilityLabels(with: pokemon.abilities)
@@ -47,17 +51,20 @@ class DetailViewController: PokemonViewController {
 	// MARK: - configureTypeLabels
 	private func configureTypeLabels(with pokemon: Pokemon){
 		
-		primaryTypeLabel.text = "\(pokemon.primaryType)"
-		primaryTypeLabel.roundedEdges()
+		primaryTypeLabel.text = "\(pokemon.primaryType.rawValue.capitalized)"
+		//primaryTypeLabel.roundedEdges()
 		primaryTypeLabel.backgroundColor = colorSelector(for: pokemon.primaryType)
 		//		switch the types to set the label background color
 		
 		if pokemon.secondaryType != nil {
-			secondaryTypeLabel.text = "\(pokemon.secondaryType!)"
+			primaryTypeLabel.roundedEdges(mask: [.layerMinXMaxYCorner, .layerMinXMinYCorner])
+			secondaryTypeLabel.roundedEdges(mask: [.layerMaxXMaxYCorner, .layerMaxXMinYCorner])
+			secondaryTypeLabel.text = "\(pokemon.secondaryType!.rawValue.capitalized)"
 			secondaryTypeLabel.backgroundColor = colorSelector(for: pokemon.secondaryType!)
-			secondaryTypeLabel.roundedEdges()
 		} else {
+			primaryTypeLabel.roundedEdges(withSize: 20.0)
 			secondaryTypeLabel.isHidden = true
+			
 		}
 	}
 	
@@ -72,8 +79,10 @@ class DetailViewController: PokemonViewController {
 			switch ability.slot {
 				case 1:
 					ability1Label.text = ability.name
-					ability1Label.backgroundColor = #colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)
+					ability1Label.backgroundColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
 					ability1Label.roundedEdges()
+					ability1Label.layer.borderWidth = 1
+					ability1Label.layer.borderColor = CGColor(srgbRed: 0.4, green: 0.12, blue: 0.78, alpha: 1)
 					if ability.isHidden {
 						ability1Label.font = UIFont.boldSystemFont(ofSize: ability1Label.font.pointSize)
 					} else {
@@ -82,8 +91,10 @@ class DetailViewController: PokemonViewController {
 				
 				case 2:
 					ability2Label.text = ability.name
-					ability2Label.backgroundColor = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 1)
+					ability2Label.backgroundColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
 					ability2Label.roundedEdges()
+					ability2Label.layer.borderWidth = 1
+					ability2Label.layer.borderColor = CGColor(srgbRed: 0.4, green: 0.12, blue: 0.78, alpha: 1)
 					ability2Label.isHidden = false
 					
 					if ability.isHidden {
@@ -94,8 +105,10 @@ class DetailViewController: PokemonViewController {
 				
 				case 3:
 					ability3Label.text = ability.name
-					ability3Label.backgroundColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
+					ability3Label.backgroundColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
 					ability3Label.roundedEdges()
+					ability3Label.layer.borderWidth = 1
+					ability3Label.layer.borderColor = CGColor(srgbRed: 0.4, green: 0.12, blue: 0.78, alpha: 1)
 					ability3Label.isHidden = false
 					
 					if ability.isHidden {

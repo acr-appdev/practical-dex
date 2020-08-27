@@ -8,6 +8,118 @@
 
 import UIKit
 
+
+// MARK: - Enum Type
+/// String value taken from https://pokeapi.co/api/v2/type
+enum Type: String {
+	case normal
+	case fire
+	case water
+	case electric
+	case grass
+	case ice
+	case fighting
+	case poison
+	case ground
+	case flying
+	case psychic
+	case bug
+	case rock
+	case ghost
+	case dragon
+	case dark
+	case steel
+	case fairy
+	case none = "unknown" // Renamed to none
+	case shadow // Probably unused
+}
+
+// MARK: - Enum EggGroup
+/// String value taken from https://pokeapi.co/api/v2/egg-group/
+enum EggGroup: String {
+	case monster
+	case water1
+	case water2
+	case water3
+	case bug
+	case mineral
+	case flying
+	case field
+	case fairy
+	case ditto
+	case dragon
+	case amorphous = "indeterminate" // Renamed to conform to bulbapedia
+	case grass = "plant" // Renamed to conform to bulbapedia
+	case humanlike = "humanshape" // Renamed to conform to bulbapedia
+	case undiscovered = "no-eggs" // Renamed to conform to bulbapedia
+}
+
+// MARK: - Enum GameVersion
+/// String value taken from https://pokeapi.co/api/v2/version?offset=0&limit=100
+enum GameVersion: String {
+	case red
+	case blue
+	case yellow
+	case gold
+	case silver
+	case crystal
+	case ruby
+	case sapphire
+	case emerald
+	case firered
+	case leafgreen
+	case diamond
+	case pearl
+	case platinum
+	case black
+	case white
+	case xd
+	case colosseum
+	case black2 = "black-2"
+	case white2 = "white-2"
+	case x
+	case y
+	case omegaruby = "omega-ruby"
+	case alphasapphire = "alpha-sapphire"
+	case sun
+	case moon
+	case ultrasun = "ultra-sun"
+	case ultramoon = "ultra-moon"
+	case sword // Currently unsupported by PokeAPI
+	case shield // Currently unsupported by PokeAPI
+}
+
+// MARK: - Enum Language
+/// String value taken from https://pokeapi.co/api/v2/language
+enum Language: String {
+	case ja_hrkt = "ja-hrkt" // Japanese Hiragana/Katakana
+	case romaji = "roomaji"
+	case zh_hant = "zh-hant" // Chinese Traditional
+	case fr
+	case de
+	case es
+	case it
+	case en
+	case cs
+	case ja
+	case zh_hans = "zh-hans" // Chinese Simplified
+	case pt_BR = "ptbr"
+}
+
+// MARK: - Enum Generation
+/// String value taken from https://pokeapi.co/api/v2/version
+enum Generation: String {
+	case i = "generation-i"
+	case ii = "generation-ii"
+	case iii = "generation-iii"
+	case iv = "generation-iv"
+	case v = "generation-v"
+	case vi = "generation-vi"
+	case vii = "generation-vii"
+	case viii = "generation-viii"
+}
+
+// MARK: - Utility Methods
 func colorSelector(for type: Type) -> UIColor{
 	switch type {
 		case .bug:
@@ -42,7 +154,7 @@ func colorSelector(for type: Type) -> UIColor{
 			return #colorLiteral(red: 0.9750000238, green: 0.3449999988, blue: 0.5320000052, alpha: 1)
 		case .rock:
 			return #colorLiteral(red: 0.7200000286, green: 0.628000021, blue: 0.2210000008, alpha: 1)
-		case .steel :
+		case .steel:
 			return #colorLiteral(red: 0.7220000029, green: 0.7210000157, blue: 0.8149999976, alpha: 1)
 		case .water:
 			return #colorLiteral(red: 0.4050000012, green: 0.5640000105, blue: 0.9409999847, alpha: 1)
@@ -51,7 +163,8 @@ func colorSelector(for type: Type) -> UIColor{
 	}
 }
 
-// should implement a gradient return later
+// MARK: - StatBar Color Selector
+//TODO: Implement a gradient return
 func colorSelector(for stat: Int) -> UIColor {
 	if 0...60 ~= stat { return .red }
 	if 61...85 ~= stat { return .orange }
@@ -60,10 +173,13 @@ func colorSelector(for stat: Int) -> UIColor {
 	else { return .gray }
 }
 
+// MARK: - UIKit Extensions
 extension UILabel {
-	func roundedEdges(withSize size: CGFloat = 10.0){
+	func roundedEdges(withSize size: CGFloat? = nil, mask: CACornerMask? = nil){
+		
 		self.clipsToBounds = true
-		layer.cornerRadius = size
+		layer.cornerRadius = size ?? frame.width*0.15
+		if mask != nil { layer.maskedCorners = mask! }
 	}
 }
 

@@ -5,29 +5,53 @@
 //  Created by Allan Rosa on 11/07/20.
 //  Copyright © 2020 Allan Rosa. All rights reserved.
 //
+//  This class represents a specific pokemon, such as Marowak or Marowak-Alola
+//  Marowak and his Alola form both share the same Species, but are different Pokemon
+//  Which results in different stats, abilities, moves, sprites, among other smaller factors such as weight and height
 
 import UIKit
+import RealmSwift
 
+/// Represents a specific, particular instance of pokémon, eg.: Marowak vs Marowak-Alola
 struct Pokemon {
+	let identifier: String // UUID().uuidString
 	let name: String
 	let number: Int
-	var sprites: SpriteImages
+	var sprites: SpriteImages // Sprites require additional Networking to fetch the images, thus they're declared as variables.
 	let primaryType: Type
 	let secondaryType: Type?
 	let abilities: [Ability]
 	let height: Measurement<UnitLength>
 	let weight: Measurement<UnitMass>
-	let flavorText: String
 	let stats: Stats
+	var species: Species?
 	
+	/// Create a placeholder pokemon
+	init(){
+		self.identifier = UUID().uuidString
+		self.name = "Missingno"
+		self.number = 0
+		self.sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
+		self.primaryType = .none
+		self.secondaryType = nil
+		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
+						  Ability(name: "Ability 2", isHidden: false, slot: 2),
+						  Ability(name: "Hidden Ability", isHidden: true, slot: 3)]
+		self.height = Measurement(value: 69, unit: UnitLength.meters)
+		self.weight = Measurement(value: 420, unit: UnitMass.grams)
+		self.stats = Stats(base: BaseStats())
+		self.species = nil
+	}
+	
+	/// Create a pokemon using PokeAPI data
 	init(withData pkmnData: PokemonData){
+		self.identifier = UUID().uuidString
 		self.name = pkmnData.name.capitalized
 		self.number = pkmnData.id
 		
 		self.primaryType = Type(rawValue: pkmnData.types[0].type.name) ?? Type.none
 		//self.primaryType = typeSelector(pkmnData.types[0])
 		if pkmnData.types.count > 1 {
-			
 			self.secondaryType = typeSelector(pkmnData.types[1])
 		} else {
 			self.secondaryType = nil
@@ -43,8 +67,6 @@ struct Pokemon {
 		let weightInGrams = Double(pkmnData.weight)*100 // Alternatively, create an extension on UnitMass to implement .hectograms
 		self.weight = Measurement(value: weightInGrams, unit: UnitMass.grams)
 		self.height = Measurement(value: Double(pkmnData.height), unit: UnitLength.decimeters)
-		
-		self.flavorText = K.Content.Label.loremIpsum
 		
 		let hp_string = "hp"
 		let atk_string = "attack"
@@ -64,57 +86,81 @@ struct Pokemon {
 		var defaultSprite = #imageLiteral(resourceName: "Missingno.")
 		self.sprites = SpriteImages(male: defaultSprite) // Assign a placeholder
 		if let imageURL = URL(string: pkmnData.sprites.front_default){
-			// TODO: Probably should fire this code from a DispatchQueue Async and reload the tableview whenever it returns?
-			//DispatchQueue.main.async {
+			//TODO: Probably should fire this code from a DispatchQueue Async and either reload the tableview whenever it returns or freeze the background
 			if let imageData = try? Data(contentsOf: imageURL){
 				defaultSprite = UIImage(data: imageData)!
 			}
 		}
 		self.sprites = SpriteImages(male: defaultSprite)
+		self.species = nil
 	}
 }
 
-extension Pokemon {
-	
-	// Test a custom pokemon
-	init(name: String , number: Int, sprites: SpriteImages, primaryType: Type, secondaryType: Type?, abilities: [Ability]){
-		self.name = name
-		self.number = number
-		self.sprites = sprites
-		self.primaryType = primaryType
-		self.secondaryType = secondaryType
-		self.abilities = abilities
-		self.height = Measurement<UnitLength>.init(value: Double(Int.random(in: 1...999)), unit: .decimeters)
-		self.weight = Measurement<UnitMass>.init(value: Double(Int.random(in: 1...9999)), unit: .grams)
-		self.flavorText = "Placeholder flavor text: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. "
-		self.stats = Stats(base: BaseStats())
-	}
-	
-	// Create a Placeholder pokemon
-	init(){
-		self.name = "Missingno"
-		self.number = 0
+// MARK: Realm Object Extension
+extension Pokemon: Persistable {
+
+	public init(managedObject: PokemonObject) {
+		identifier = managedObject.identifier
+		name = managedObject.name
+		number = managedObject.number
+		
+//		sprites = managedObject.sprites
+//		primaryType = managedObject.primaryType
+//		secondaryType = managedObject.secondaryType
+//		abilities = managedObject.abilities
+//		height = managedObject.height
+//		weight = managedObject.weight
+//		stats = managedObject.stats
+//
+//		species = managedObject.species.flatMap( Species.init(managedObject:) )
+//		sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
+//		primaryType = .none
+//		secondaryType = nil
+//		abilities = []
+//		height = Measurement(value: 0, unit: .decimeters)
+//		weight = Measurement(value: 0, unit: .grams)
+//		stats = Stats()
+//		species = nil
+		
 		self.sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
 		self.primaryType = .none
 		self.secondaryType = nil
 		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
 						  Ability(name: "Ability 2", isHidden: false, slot: 2),
 						  Ability(name: "Hidden Ability", isHidden: true, slot: 3)]
-		//self.stats
 		self.height = Measurement(value: 69, unit: UnitLength.meters)
 		self.weight = Measurement(value: 420, unit: UnitMass.grams)
-		self.flavorText = K.Content.Label.loremIpsum
 		self.stats = Stats(base: BaseStats())
+		self.species = nil
+		
+	}
+
+	/// Returns the Realm Object implementation for the class.
+	func managedObject() -> PokemonObject {
+		let pokemonObject = PokemonObject(pokemon: self)
+		
+//		pokemon.sprites = sprites
+//		pokemon.primaryType = primaryType
+//		pokemon.secondaryType = secondaryType
+//		pokemon.abilities = abilities
+//		pokemon.height = height
+//		pokemon.weight = weight
+//		pokemon.stats = stats
+//		pokemon.species = species?.managedObject()
+
+		return pokemonObject
 	}
 }
 
-
+// MARK: Extra Structs Definition
+/// Pokémon Ability data
 struct Ability {
 	let name: String
 	let isHidden: Bool
 	let slot: Int
 }
 
+/// Provides pokémon sprites
 struct SpriteImages {
 	let male: UIImage
 	// let female: UIImage
@@ -126,20 +172,18 @@ struct SpriteImages {
 	// let shinyFemale_back: UIImage
 }
 
+/// Provides pokémon stat data, related to calculating damage (calc function)
 struct Stats {
 	let base: BaseStats
+	// let evs: EffortValues
+	// let ivs: IndividualValues
 	
-	
-	//	struct EffortValues {
-	//	let HP: Int
-	//	let Atk: Int
-	//	let Def: Int
-	//	let SpA: Int
-	//	let SpD: Int
-	//	let Spe: Int
-	//	}
+	init(base: BaseStats = BaseStats.init()) {
+		self.base = base
+	}
 }
 
+/// Stores the base stats for a given pokémon, ranging from
 struct BaseStats {
 	let hp: Int
 	let atk: Int
@@ -158,13 +202,14 @@ struct BaseStats {
 		self.spe = spe
 	}
 	
-	
+	/// Returns the Base Stat Total for this pokémon
 	func bst() -> Int {
 		return (hp+atk+def+spa+spd+spe)
 	}
 }
 
-
+//MARK: - Private Methods
+//TODO: [Refactor] Check if it's still relevant
 private func typeSelector(_ input: TypeData) -> Type {
 	let returnType: Type
 	switch input.type.name.lowercased() {

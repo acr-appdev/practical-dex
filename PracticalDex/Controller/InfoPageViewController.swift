@@ -28,14 +28,7 @@ class InfoPageViewController: UIPageViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		
-		
-		//self.pokemon = Pokemon(name: "[B]ass", number: 420, sprites: SpriteImages(male: #imageLiteral(resourceName: "126")), primaryType: .None, secondaryType: .Fire, abilities: [AbilityAttribute(ability: AbilityData(name: "LolZ"), is_hidden: false, slot: 1), AbilityAttribute(ability: AbilityData(name: "Lmao"), is_hidden: true, slot: 2)])
-		
-		print("InfoPageViewDidLoad: \(pokemon.name)")
-
-		
+	
 		self.dataSource = self
 		view.backgroundColor = .systemPink
 		
