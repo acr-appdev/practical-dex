@@ -10,16 +10,11 @@ import UIKit
 
 class PokedexViewController: UICollectionViewController, PokedexManagerDelegate {
 	func didFinishPopulatingPokedex(_ pokedexManager: PokedexManager) {
-		//
-		print("didFinishPopulatingPokedex")
 		pokedexManager.pkmnGroup.notify(queue: .main, execute: {
-			print("--- Ready to Save Data ---")
+			self.pokedexManager.pokemonList.sort(by: {$0.number < $1.number})
 			pokedexManager.persist()
-			
-			self.pokedexManager.pokemonList.forEach { pkmn in
-				print(pkmn.name)
-			}
-			print("--------------------------")
+			UserDefaults.standard.set(true, forKey: K.App.UserDefaults.databaseIsPopulated)
+			self.collectionView.reloadData()
 		})
 	}
 	
@@ -30,7 +25,7 @@ class PokedexViewController: UICollectionViewController, PokedexManagerDelegate 
 	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
 		// Using DispatchQueue because the data comes from networking, so the app isn't frozen
 		DispatchQueue.main.async {
-			_ = self.pokedexManager.pokemonList.sorted(by: {$0.number < $1.number})
+			self.pokedexManager.pokemonList.sort(by: {$0.number < $1.number})
 			self.collectionView.reloadData()
 		}
 	}
@@ -43,7 +38,9 @@ class PokedexViewController: UICollectionViewController, PokedexManagerDelegate 
 		
 		pokedexManager.delegate = self
 
-		pokedexManager.populatePokedex(entriesLimit: 30, offset: 0)
+		UserDefaults.standard.set(false, forKey: K.App.UserDefaults.databaseIsPopulated)
+		
+		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 15)
 		//pokedexManager.populatePokedex(entriesLimit: 151, offset: 0)
 		//pokedexManager.populatePokedex(entriesLimit: 800, offset: 0)
 		

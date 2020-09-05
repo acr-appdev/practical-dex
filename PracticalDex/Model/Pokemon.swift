@@ -52,7 +52,7 @@ struct Pokemon {
 		self.primaryType = Type(rawValue: pkmnData.types[0].type.name) ?? Type.none
 		//self.primaryType = typeSelector(pkmnData.types[0])
 		if pkmnData.types.count > 1 {
-			self.secondaryType = typeSelector(pkmnData.types[1])
+			self.secondaryType = Type(rawValue: pkmnData.types[1].type.name.lowercased())
 		} else {
 			self.secondaryType = nil
 		}
@@ -104,33 +104,32 @@ extension Pokemon: Persistable {
 		name = managedObject.name
 		number = managedObject.number
 		
-//		sprites = managedObject.sprites
-//		primaryType = managedObject.primaryType
-//		secondaryType = managedObject.secondaryType
-//		abilities = managedObject.abilities
-//		height = managedObject.height
-//		weight = managedObject.weight
-//		stats = managedObject.stats
-//
-//		species = managedObject.species.flatMap( Species.init(managedObject:) )
-//		sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
-//		primaryType = .none
-//		secondaryType = nil
-//		abilities = []
-//		height = Measurement(value: 0, unit: .decimeters)
-//		weight = Measurement(value: 0, unit: .grams)
-//		stats = Stats()
-//		species = nil
+		height = Measurement(value: managedObject.height, unit: UnitLength.meters)
+		weight = Measurement(value: managedObject.weight, unit: UnitMass.kilograms)
 		
-		self.sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
-		self.primaryType = .none
-		self.secondaryType = nil
+		primaryType = getType(from: managedObject.primaryType)
+		let type = getType(from: managedObject.secondaryType)
+		if type != .none { secondaryType = type }
+		else { secondaryType = nil }
+
+		let baseStats = BaseStats(hp: managedObject.stat_hp,
+								 atk: managedObject.stat_atk,
+								 def: managedObject.stat_def,
+								 spa: managedObject.stat_spa,
+								 spd: managedObject.stat_spd,
+								 spe: managedObject.stat_spe)
+		stats = Stats(base: baseStats)
+		
+		let imageURL = getDocumentsDirectory().appendingPathComponent(K.App.spritesFolder).appendingPathComponent(managedObject.sprite_front)
+		if let maleSprite = UIImage(contentsOfFile: imageURL.path){
+			sprites = SpriteImages(male: maleSprite)
+		} else {
+			sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
+		}
+		
 		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
 						  Ability(name: "Ability 2", isHidden: false, slot: 2),
 						  Ability(name: "Hidden Ability", isHidden: true, slot: 3)]
-		self.height = Measurement(value: 69, unit: UnitLength.meters)
-		self.weight = Measurement(value: 420, unit: UnitMass.grams)
-		self.stats = Stats(base: BaseStats())
 		self.species = nil
 		
 	}
@@ -138,27 +137,11 @@ extension Pokemon: Persistable {
 	/// Returns the Realm Object implementation for the class.
 	func managedObject() -> PokemonObject {
 		let pokemonObject = PokemonObject(pokemon: self)
-		
-//		pokemon.sprites = sprites
-//		pokemon.primaryType = primaryType
-//		pokemon.secondaryType = secondaryType
-//		pokemon.abilities = abilities
-//		pokemon.height = height
-//		pokemon.weight = weight
-//		pokemon.stats = stats
-//		pokemon.species = species?.managedObject()
-
 		return pokemonObject
 	}
 }
 
 // MARK: Extra Structs Definition
-/// Pokémon Ability data
-struct Ability {
-	let name: String
-	let isHidden: Bool
-	let slot: Int
-}
 
 /// Provides pokémon sprites
 struct SpriteImages {
@@ -170,6 +153,7 @@ struct SpriteImages {
 	// let female_back: UIImage
 	// let shinyMale_back: UIImage
 	// let shinyFemale_back: UIImage
+	
 }
 
 /// Provides pokémon stat data, related to calculating damage (calc function)
@@ -208,50 +192,3 @@ struct BaseStats {
 	}
 }
 
-//MARK: - Private Methods
-//TODO: [Refactor] Check if it's still relevant
-private func typeSelector(_ input: TypeData) -> Type {
-	let returnType: Type
-	switch input.type.name.lowercased() {
-		case "bug" :
-			returnType = Type.bug
-		case "dark" :
-			returnType = Type.dark
-		case "dragon" :
-			returnType = Type.dragon
-		case "electric" :
-			returnType = Type.electric
-		case "fairy" :
-			returnType = Type.fairy
-		case "fighting" :
-			returnType = Type.fighting
-		case "fire" :
-			returnType = Type.fire
-		case "flying" :
-			returnType = Type.flying
-		case "ghost" :
-			returnType = Type.ghost
-		case "grass" :
-			returnType = Type.grass
-		case "ground" :
-			returnType = Type.ground
-		case "ice" :
-			returnType = Type.ice
-		case "normal" :
-			returnType = Type.normal
-		case "poison" :
-			returnType = Type.poison
-		case "psychic" :
-			returnType = Type.psychic
-		case "rock":
-			returnType = Type.rock
-		case "steel" :
-			returnType = Type.steel
-		case "water":
-			returnType = Type.water
-		default:
-			returnType = Type.none
-	}
-	
-	return returnType
-}

@@ -10,17 +10,28 @@ import RealmSwift
 
 final class PokemonObject: Object {
 	
-	@objc dynamic var identifier = UUID().uuidString
-	@objc dynamic var name = ""
-	@objc dynamic var number = 0
-//	@objc dynamic var sprites: SpriteObject = SpriteObject()
-//	@objc dynamic var primaryType: Type = .none
-//	@objc dynamic var secondaryType: Type? = nil
-//	@objc dynamic var abilities: [AbilityObject] = []
-//	@objc dynamic var height = Measurement(value: 0, unit: UnitLength.decimeters)
-//	@objc dynamic var weight = Measurement(value: 0, unit: UnitMass.grams)
-//	@objc dynamic var stats = StatsObject()
-//	@objc dynamic var species: SpeciesObject? = nil
+	@objc dynamic var identifier: String = UUID().uuidString
+	@objc dynamic var name: String = ""
+	@objc dynamic var number: Int = 0
+	@objc dynamic var primaryType: String = ""
+	@objc dynamic var secondaryType: String = ""
+	@objc dynamic var height: Double = 0 // in Decimeters
+	@objc dynamic var weight: Double = 0 // in Grams
+	
+	@objc dynamic var stat_hp:  Int = 0
+	@objc dynamic var stat_atk: Int = 0
+	@objc dynamic var stat_def: Int = 0
+	@objc dynamic var stat_spa: Int = 0
+	@objc dynamic var stat_spd: Int = 0
+	@objc dynamic var stat_spe: Int = 0
+	
+	@objc dynamic var sprite_front: String = ""
+	@objc dynamic var sprite_back: String = ""
+	@objc dynamic var sprite_frontShiny: String = ""
+	@objc dynamic var sprite_backShiny: String = ""
+	
+	let abilities = List<AbilityObject>()
+	//	@objc dynamic var species: SpeciesObject? = nil
 
 	override static func primaryKey() -> String? {
 		return "number"
@@ -31,55 +42,26 @@ final class PokemonObject: Object {
 		identifier = pokemon.identifier
 		name = pokemon.name
 		number = pokemon.number
-//		sprites = SpriteObject(sprites: pokemon.sprites)
-//
-//		var newAbilities: [AbilityObject] = []
-//		pokemon.abilities.forEach({ ability in
-//			newAbilities.append(AbilityObject(ability: ability))
-//		})
-//		height = pokemon.height
-//		weight = pokemon.weight
-//		stats = StatsObject(stats: pokemon.stats)
+		primaryType = pokemon.primaryType.rawValue
+		secondaryType = pokemon.secondaryType?.rawValue ?? ""
+		
+		if let sprite_frontURL = saveImage(pokemon.sprites.male, named: "\(pokemon.name)_front", toFolder: K.App.spritesFolder) {
+			sprite_front = sprite_frontURL.lastPathComponent
+		}
+		
+		height = pokemon.height.converted(to: .meters).value
+		weight = pokemon.weight.converted(to: .kilograms).value
+		
+		stat_hp  = pokemon.stats.base.hp
+		stat_atk = pokemon.stats.base.atk
+		stat_def = pokemon.stats.base.def
+		stat_spa = pokemon.stats.base.spa
+		stat_spd = pokemon.stats.base.spd
+		stat_spe = pokemon.stats.base.spe
+		
 //		species = SpeciesObject(withSpecies: pokemon.species ?? Species())
 	}
+	
+	//MARK: - Private Methods
+	
 }
-
-//final class SpriteObject: NSObject {
-//	@objc dynamic var male: UIImage = #imageLiteral(resourceName: "Missingno.")
-//
-//	override init() {
-//		male = #imageLiteral(resourceName: "Missingno.")
-//	}
-//	init(sprites: SpriteImages){
-//		self.male = sprites.male
-//	}
-//}
-//
-//final class AbilityObject: NSObject {
-//	@objc dynamic var name: String = ""
-//	@objc dynamic var isHidden: Bool = false
-//	@objc dynamic var slot: Int = 0
-//
-//	init(ability: Ability){
-//		name = ability.name
-//		isHidden = ability.isHidden
-//		slot = ability.slot
-//	}
-//}
-//
-//final class StatsObject: NSObject {
-//	@objc dynamic var base: [String:Int] = [K.Model.hp:0, K.Model.atk:0, K.Model.def:0, K.Model.spa:0, K.Model.spd:0, K.Model.spe:0]
-//
-//	override init() {
-//	}
-//
-//	init(stats: Stats) {
-//		base[K.Model.hp] = stats.base.hp
-//		base[K.Model.atk] = stats.base.atk
-//		base[K.Model.def] = stats.base.def
-//		base[K.Model.spa] = stats.base.spa
-//		base[K.Model.spd] = stats.base.spd
-//		base[K.Model.spe] = stats.base.spe
-//	}
-//}
-

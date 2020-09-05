@@ -27,7 +27,7 @@ final class SpeciesObject: Object {
 //	@objc dynamic var names: [LocalizedName] = []
 	
 	override static func primaryKey() -> String? {
-		return "identifier"
+		return "number"
 	}
 	
 	convenience init(withSpecies species: Species){

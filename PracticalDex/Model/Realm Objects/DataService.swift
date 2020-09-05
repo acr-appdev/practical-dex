@@ -37,10 +37,33 @@ public final class DataService {
 				})
 			}
 		} catch {
-			print("something went wrong: \(error)")
 			post(error)
 		}
 	}
+	
+	public func retrieve<T: Persistable>(_ model: T.Type, predicate: NSPredicate? = nil, sorted: Sorted? = nil, completion: (([T]) -> ())) {
+		
+		var objects = self.realm.objects(model.ManagedObject)
+		
+        if let predicate = predicate {
+            objects = objects.filter(predicate)
+        }
+        
+        if let sorted = sorted {
+            objects = objects.sorted(byKeyPath: sorted.key, ascending: sorted.ascending)
+        }
+		
+		var modelObjects: [T] = []
+		
+		objects.forEach({ object in
+			let newModelObject: T
+			newModelObject = T(managedObject: object)
+			
+			modelObjects.append(newModelObject)
+		})
+		
+		completion(modelObjects)
+    }
 	
 	public func update<T: Object>(_ object: T, with dictionary: [String: Any?]){
 		do {
@@ -62,7 +85,6 @@ public final class DataService {
 		} catch {
 			post(error)
 		}
-
 	}
 	
 	let realmErrorNotificationName = NSNotification.Name("RealmError")
@@ -81,4 +103,9 @@ public final class DataService {
 		NotificationCenter.default.removeObserver(vc, name: realmErrorNotificationName, object: nil)
 	}
 	
+}
+
+public struct Sorted {
+  var key: String
+  var ascending: Bool = true
 }

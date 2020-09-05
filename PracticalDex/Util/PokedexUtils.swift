@@ -163,6 +163,14 @@ func colorSelector(for type: Type) -> UIColor{
 	}
 }
 
+func getType(from string: String) -> Type {
+	if string.lowercased() == "notype" || string.lowercased() == "none" { return .none }
+	else {
+		if let type = Type(rawValue: string.lowercased()) { return type }
+		else { return .none }
+	}
+}
+
 // MARK: - StatBar Color Selector
 //TODO: Implement a gradient return
 func colorSelector(for stat: Int) -> UIColor {

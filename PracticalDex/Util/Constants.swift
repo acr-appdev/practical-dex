@@ -34,6 +34,11 @@ struct K {
 		static let spe = "spe"
 	}
 	struct App {
+		static let spritesFolder = "PokedexSprites"
+		
+		struct UserDefaults {
+			static let databaseIsPopulated = "databaseIsPopulated"
+		}
 		struct View {
 			struct Segue {
 				static let detailView = "goToDetailView"
