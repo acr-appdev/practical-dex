@@ -17,6 +17,7 @@ public final class DataService {
 	
 	var realm = try! Realm()
 
+	// MARK: - Create
 	public func create<T: Persistable>(_ object: T) {
 		do {
 			try realm.write {
@@ -27,6 +28,7 @@ public final class DataService {
 		}
     }
 	
+	// MARK: - Create
 	public func create<T: Persistable>(_ objects: [T]) {
 		do {
 			try realm.write {
@@ -41,6 +43,7 @@ public final class DataService {
 		}
 	}
 	
+	// MARK: - Retrieve
 	public func retrieve<T: Persistable>(_ model: T.Type, predicate: NSPredicate? = nil, sorted: Sorted? = nil, completion: (([T]) -> ())) {
 		
 		var objects = self.realm.objects(model.ManagedObject)
@@ -65,6 +68,7 @@ public final class DataService {
 		completion(modelObjects)
     }
 	
+	// MARK: - Update
 	public func update<T: Object>(_ object: T, with dictionary: [String: Any?]){
 		do {
 			try realm.write {
@@ -77,11 +81,24 @@ public final class DataService {
 		}
 	}
 	
+	// MARK: - Delete
 	public func delete<T: Object>(_ object: T){
 		do {
 			try realm.write {
 				realm.delete(object)
 			}
+		} catch {
+			post(error)
+		}
+	}
+	
+	// MARK: - DeleteAll
+	public func deleteAll(){
+		do {
+			try realm.write({
+				realm.deleteAll()
+				print("purged!!!!!")
+			})
 		} catch {
 			post(error)
 		}

@@ -31,7 +31,8 @@ struct Pokemon {
 		self.identifier = UUID().uuidString
 		self.name = "Missingno"
 		self.number = 0
-		self.sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
+		let img = UIImage(named: "placeholder-missingno")
+		self.sprites = SpriteImages(male: img!)
 		self.primaryType = .none
 		self.secondaryType = nil
 		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
@@ -83,7 +84,7 @@ struct Pokemon {
 		self.stats = Stats(base: bs)
 		
 		// This should be the last part initialized because we have to retrieve the data from another url
-		var defaultSprite = #imageLiteral(resourceName: "Missingno.")
+		var defaultSprite = UIImage(named: K.Design.Image.pkmnSpritePlaceholder)!
 		self.sprites = SpriteImages(male: defaultSprite) // Assign a placeholder
 		if let imageURL = URL(string: pkmnData.sprites.front_default){
 			//TODO: Probably should fire this code from a DispatchQueue Async and either reload the tableview whenever it returns or freeze the background
@@ -109,8 +110,7 @@ extension Pokemon: Persistable {
 		
 		primaryType = getType(from: managedObject.primaryType)
 		let type = getType(from: managedObject.secondaryType)
-		if type != .none { secondaryType = type }
-		else { secondaryType = nil }
+		secondaryType = type != .none ? type : nil
 
 		let baseStats = BaseStats(hp: managedObject.stat_hp,
 								 atk: managedObject.stat_atk,
@@ -126,6 +126,10 @@ extension Pokemon: Persistable {
 		} else {
 			sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
 		}
+		
+//		self.abilities = [Ability(name: managedObject.ability1, isHidden: managedObject.ability1_isHidden, slot: 1),
+//						  Ability(name: managedObject.ability2, isHidden: managedObject.ability2_isHidden, slot: 2),
+//						  Ability(name: managedObject.ability3, isHidden: managedObject.ability3_isHidden, slot: 3)]
 		
 		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
 						  Ability(name: "Ability 2", isHidden: false, slot: 2),

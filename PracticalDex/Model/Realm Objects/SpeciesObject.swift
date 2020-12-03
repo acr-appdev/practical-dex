@@ -39,18 +39,18 @@ final class SpeciesObject: Object {
 	
 }
 
-class FlavorTextEntryObject: Object {
-	let flavorTextDescription: String = ""
-	let language: Language = .en
-	let version: GameVersion = .red
-}
+//class FlavorTextEntryObject: Object {
+//	let flavorTextDescription: String = ""
+//	let language: Language = .en
+//	let version: GameVersion = .red
+//}
 
-class GenusObject: Object {
-	let genus: String = ""
-	let language: Language = .en
-}
+//class GenusObject: Object {
+//	let genus: String = ""
+//	let language: Language = .en
+//}
 
-struct LocalizedNameObject {
-	let name: String
-	let language: Language
-}
+//struct LocalizedNameObject {
+//	let name: String
+//	let language: Language
+//}

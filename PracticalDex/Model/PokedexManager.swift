@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+//import Network
 
 protocol PokedexManagerDelegate {
 	// The delegate pattern protocol's requirements
@@ -28,13 +29,12 @@ class PokedexManager {
 		DataService.shared.create(pokemonList)
 	}
 	
-	
 	// MARK: - fetchPokemon
-	/// Fetches the pokémon with (name), informing the delegate with the call result
+	/// Fetches a single pokémon by its (name), informing the delegate with the API call result, batch parameter is used to indicate if this method is being called by fetchPokemon fromNumber toNumber
 	func fetchPokemon(byName name: String, batch: Bool = false){
 		let urlString = "https://pokeapi.co/api/v2/pokemon/\(name)"
 		
-		fetchData(urlString: urlString){ (result: Result<PokemonData, Error>) in
+		fetchData(urlString: urlString) { (result: Result<PokemonData, Error>) in
 			switch result {
 				case .success(let pkmnData):
 					let pkmn = Pokemon(withData: pkmnData)
@@ -44,8 +44,10 @@ class PokedexManager {
 						self.pkmnGroup.leave()
 						self.counter -= 1
 						if self.counter == 0 {
-							self.pkmnGroup.leave() // leave an extra time to account for the enter() on populatePokedex
-							UserDefaults.standard.set(true, forKey: K.App.UserDefaults.databaseIsPopulated)
+							self.pkmnGroup.leave() // .leave() an extra time to account for the .enter() on populatePokedex
+							UserDefaults.standard.set(true, forKey: K.App.Defaults.databaseIsPopulated)
+							
+							print("---- didFinishPopulatingPokedex ----")
 							self.delegate?.didFinishPopulatingPokedex(self)
 						}
 					}
@@ -100,18 +102,32 @@ class PokedexManager {
 	
 	// MARK: - populatePokedex
 	/// Fetches (limit) pokémon, starting from (offset), based on their National Pokedex number
-	func populatePokedex(fromNumber offset: Int, toNumber limit: Int){
+	func populatePokedex(fromNumber offset: Int = 0, toNumber limit: Int = 800){
 		// retrieve from database if populated, else fetch data from pokeAPI
-		if UserDefaults.standard.bool(forKey: K.App.UserDefaults.databaseIsPopulated){
+		if UserDefaults.standard.bool(forKey: K.App.Defaults.databaseIsPopulated){
+			print("--- databaseIsPopulated ---")
 			let sortParameter = Sorted(key: "number", ascending: true)
-			DataService.shared.retrieve( Pokemon.self, sorted: sortParameter) { (retrievedList) in
+			DataService.shared.retrieve(Pokemon.self, sorted: sortParameter) { (retrievedList) in
 				self.pokemonList = retrievedList
 			}
+			pokemonList.forEach({ p in print("=> \(p.name)")})
+			delegate?.didFinishPopulatingPokedex(self)
 		} else {
 			fetchPokemon(fromNumber: offset, toNumber: limit)
 		}
-		
 	}
 	
+	// MARK: - resetData
+	/// Resets the loaded data, purges the database if purgeDatabase is true
+	func resetData(purgeDatabase: Bool = false){
+		pokemonList.removeAll()
+		
+		if purgeDatabase {
+			DataService.shared.deleteAll()
+			UserDefaults.standard.setValue(false, forKey: K.App.Defaults.databaseIsPopulated)
+		}
+		
+		self.delegate?.didFinishPopulatingPokedex(self)
+	}
 	
 }
