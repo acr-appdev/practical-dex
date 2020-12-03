@@ -35,8 +35,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 					}
 				}
 			})
-		//UserDefaults.standard.setValue(true, forKey: K.App.Defaults.hasLaunchedBefore)
+		//UserDefaults.standard.setValue(false, forKey: K.App.Defaults.hasLaunchedBefore)
 		if !defaults.bool(forKey: K.App.Defaults.hasLaunchedBefore) {
+				print(" ==== \n First Launch \n ====")
 				setUserDefaults()
 		}
 		

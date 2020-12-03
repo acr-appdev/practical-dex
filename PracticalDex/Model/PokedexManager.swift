@@ -20,13 +20,26 @@ protocol PokedexManagerDelegate {
 
 /// Manages Pokedex entries and handles calls to PokeAPI (https://pokeapi.co/api/v2)
 class PokedexManager {
+	
+	// MARK: -- ATTRIBUTES --
+	
 	var pokemonList: [Pokemon] = []
 	let pkmnGroup = DispatchGroup()
 	var delegate: PokedexManagerDelegate?
 	private var counter = 0
+	var dataNeedsPersistence = false
 	
+	// MARK: -- INIT --
+	// No custom Init
+	
+	// MARK: -- FUNCTIONS --
+	
+	/// This is a function used to persist data in case there was a call to the API to fetch data (NOTE: Realm complains if its called outside the main thread so this function is public in order to be accessed from the PokedexViewController, which runs on the main thread)
 	func persist() {
-		DataService.shared.create(pokemonList)
+		if dataNeedsPersistence {
+			DataService.shared.create(pokemonList)
+			dataNeedsPersistence = false
+		}
 	}
 	
 	// MARK: - fetchPokemon
@@ -46,12 +59,9 @@ class PokedexManager {
 						if self.counter == 0 {
 							self.pkmnGroup.leave() // .leave() an extra time to account for the .enter() on populatePokedex
 							UserDefaults.standard.set(true, forKey: K.App.Defaults.databaseIsPopulated)
-							
-							print("---- didFinishPopulatingPokedex ----")
 							self.delegate?.didFinishPopulatingPokedex(self)
 						}
 					}
-					
 					self.delegate?.didRetrievePokemon(self, pokemon: pkmn)
 				
 				case .failure(let error):
@@ -105,14 +115,13 @@ class PokedexManager {
 	func populatePokedex(fromNumber offset: Int = 0, toNumber limit: Int = 800){
 		// retrieve from database if populated, else fetch data from pokeAPI
 		if UserDefaults.standard.bool(forKey: K.App.Defaults.databaseIsPopulated){
-			print("--- databaseIsPopulated ---")
 			let sortParameter = Sorted(key: "number", ascending: true)
 			DataService.shared.retrieve(Pokemon.self, sorted: sortParameter) { (retrievedList) in
 				self.pokemonList = retrievedList
 			}
-			pokemonList.forEach({ p in print("=> \(p.name)")})
 			delegate?.didFinishPopulatingPokedex(self)
 		} else {
+			dataNeedsPersistence = true
 			fetchPokemon(fromNumber: offset, toNumber: limit)
 		}
 	}
@@ -126,7 +135,6 @@ class PokedexManager {
 			DataService.shared.deleteAll()
 			UserDefaults.standard.setValue(false, forKey: K.App.Defaults.databaseIsPopulated)
 		}
-		
 		self.delegate?.didFinishPopulatingPokedex(self)
 	}
 	

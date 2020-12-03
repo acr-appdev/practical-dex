@@ -64,7 +64,7 @@ func fetchData<T: Decodable>(urlString: String, completion: @escaping (Result<T,
 func setUserDefaults() {
 	
 	let ud = UserDefaults.standard
-	ud.set(false, forKey: K.App.Defaults.hasLaunchedBefore)
+	ud.set(true, forKey: K.App.Defaults.hasLaunchedBefore)
 	
 	// Set false so the database is populated automatically
 	ud.set(false, forKey: K.App.Defaults.databaseIsPopulated)

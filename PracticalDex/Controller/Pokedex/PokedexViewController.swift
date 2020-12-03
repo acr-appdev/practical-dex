@@ -8,16 +8,19 @@
 
 import UIKit
 
-class PokedexViewController: UICollectionViewController {
+class PokedexViewController: UIViewController {
 	
 	private var selectedPokemon = Pokemon()
 	private var pokedexManager = PokedexManager()
 	private var searchController = UISearchController()
+	@IBOutlet weak var collectionView: UICollectionView!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
 		pokedexManager.delegate = self
+		collectionView.delegate = self
+		collectionView.dataSource = self
 		
 		if let settingsNavVC = tabBarController?.viewControllers![1] as? UINavigationController {
 			if let settingsVC = settingsNavVC.topViewController as? SettingsViewController {
@@ -25,8 +28,7 @@ class PokedexViewController: UICollectionViewController {
 			}
 		}
 
-		
-		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 30)
+		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 31)
 		//pokedexManager.populatePokedex(entriesLimit: 151, offset: 0)
 		//pokedexManager.populatePokedex(entriesLimit: 800, offset: 0)
 		
@@ -44,54 +46,6 @@ class PokedexViewController: UICollectionViewController {
 		destinationVC.pokemon = selectedPokemon
 	}
 	
-	
-	// MARK: UICollectionViewDataSource
-	override func numberOfSections(in collectionView: UICollectionView) -> Int {
-		return 1
-	}
-	
-	override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		return pokedexManager.pokemonList.count
-	}
-	
-	override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-		var cell = UICollectionViewCell()
-		
-		if let pokedexCell = collectionView.dequeueReusableCell(withReuseIdentifier: K.App.View.Cell.pokedex, for: indexPath) as? PokedexCell {
-
-			pokedexCell.configure(with: pokedexManager.pokemonList[indexPath.row])
-			cell = pokedexCell
-		}
-		return cell
-	}
-	
-	
-	// MARK: UICollectionViewDelegate
-	override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		let pokemon = pokedexManager.pokemonList[indexPath.row]
-		selectedPokemon = pokemon
-		
-		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)
-	}
-}
-
-//MARK: - UICollectionViewDelegateFlowLayout
-extension PokedexViewController: UICollectionViewDelegateFlowLayout{
-	
-	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-		return UIEdgeInsets(top: 24, left: 6, bottom: 6, right: 6)
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-		
-		let numberOfColumns: CGFloat = 2
-		let totalWidth = view.frame.width
-		let totalOffsetSpace: CGFloat = 32 // in points
-		let pokedexCellWidth = (totalWidth - totalOffsetSpace) / numberOfColumns
-		
-		return CGSize(width: pokedexCellWidth, height: pokedexCellWidth) // gimme a square
-	}
-	
 }
 
 // MARK: -- PROTOCOLS --
@@ -102,7 +56,6 @@ extension PokedexViewController: PokedexManagerDelegate {
 		pokedexManager.pkmnGroup.notify(queue: .main, execute: {
 			self.pokedexManager.pokemonList.sort(by: {$0.number < $1.number})
 			pokedexManager.persist()
-			UserDefaults.standard.set(true, forKey: K.App.Defaults.databaseIsPopulated)
 			self.collectionView.reloadData()
 		})
 	}
@@ -129,7 +82,53 @@ extension PokedexViewController: SettingsDelegate {
 	func resetData() {
 		pokedexManager.resetData(purgeDatabase: true)
 		collectionView.reloadData()
-		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 151)
+		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 51)
+	}
+}
+
+// MARK: CollectionView Delegate & DataSource
+extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+
+	func numberOfSections(in collectionView: UICollectionView) -> Int {
+		return 1
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+		return pokedexManager.pokemonList.count
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+		var cell = UICollectionViewCell()
+		if let pokedexCell = collectionView.dequeueReusableCell(withReuseIdentifier: K.App.View.Cell.pokedex, for: indexPath) as? PokedexCell {
+
+			pokedexCell.configure(with: pokedexManager.pokemonList[indexPath.row])
+			cell = pokedexCell
+		}
+		return cell
+	}
+
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		let pokemon = pokedexManager.pokemonList[indexPath.row]
+		selectedPokemon = pokemon
+		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)
+	}
+}
+
+//MARK: - CollectionViewDelegateFlowLayout
+extension PokedexViewController: UICollectionViewDelegateFlowLayout {
+	
+	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+		return UIEdgeInsets(top: 24, left: 6, bottom: 6, right: 6)
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+		
+		let numberOfColumns: CGFloat = 2
+		let totalWidth = view.frame.width
+		let totalOffsetSpace: CGFloat = 18 // in points (min for 2 columns = 12)
+		let pokedexCellWidth = (totalWidth - totalOffsetSpace) / numberOfColumns
+		
+		return CGSize(width: pokedexCellWidth, height: pokedexCellWidth) // make the cell a square
 	}
 }
 
