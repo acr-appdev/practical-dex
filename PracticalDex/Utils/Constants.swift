@@ -35,6 +35,7 @@ struct K {
 		static let bgmList = ["Analog-Nostalgia", "Monster-Street-Fighters", "The-8-bit-Princess", "Whimsical-Popsicle", "Racing-Menu"]
 		static let wallpaperList = ["box-backyard", "box-forest", "box-heartgold", "box-kimonogirl", "box-monochrome", "box-musical", "box-pikapika", "box-pokeathlon", "box-pokecenter", "box-ribbon", "box-savannah", "box-simple", "box-sky", "box-soulsilver", "box-volcano", "box-zigzagoon"]
 		
+		// rework into extension [https://cocoacasts.com/ud-12-benefits-of-creating-an-extension-for-user-defaults]
 		struct Defaults {
 			static let hasLaunchedBefore = "hasLaunchedBefore"
 			static let databaseIsPopulated = "databaseIsPopulated"
@@ -43,6 +44,7 @@ struct K {
 			static let selectedBGM = "selectedBGM"
 			static let selectedBGMIndex = "selectedBGMIndex"
 			static let selectedWallpaperIndex = "selectedWallpaperIndex"
+			static let selectedLanguage = "selectedLanguage"
 		}
 		struct View {
 			struct Segue {

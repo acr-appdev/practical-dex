@@ -9,6 +9,9 @@
 
 import Foundation
 
+/**
+Stores Pokémon data from parsed JSON responses from PokeAPI
+*/
 struct PokemonData: Decodable {
 	let abilities: [AbilityData]
 	// let base_experience: Int

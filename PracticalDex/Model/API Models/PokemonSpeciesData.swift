@@ -9,6 +9,10 @@
 
 import Foundation
 
+
+/**
+Stores PokemonSpecies data parsed from JSON responses from PokeAPI
+*/
 struct PokemonSpeciesData: Decodable {
 	let base_happiness: Int
 	let capture_rate: Int

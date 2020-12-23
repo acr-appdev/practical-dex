@@ -20,6 +20,19 @@ class AboutViewController: PokemonViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
+		flavorTextLabel.text = pokemon.species?.flavorTextEntries[selectedLanguage]?.flavorTextDescription
+		
+		if let genderRate = pokemon.species?.genderRate {
+			// print("\(pokemon.name) GenderRate: \(genderRate)")
+			genderBar.progress = Float(genderRate)
+			genderBar.backgroundColor = .systemPink
+			genderBar.progressTintColor = .systemBlue
+		}
+		else { // genderless
+			// print("\(pokemon.name) GenderRate: Genderless")
+			genderBar.progress = 0
+			genderBar.backgroundColor = .black
+		}
 		genderBar.layer.cornerRadius = 6
 		genderBar.clipsToBounds = true
 		genderBar.layer.sublayers![1].cornerRadius = 6

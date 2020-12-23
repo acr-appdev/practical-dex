@@ -1,5 +1,5 @@
 //
-//  PokedexUtils.swift
+//  PokemonEnums.swift
 //  PracticalDex
 //
 //  Created by Allan Rosa on 18/07/20.
@@ -10,7 +10,7 @@ import UIKit
 
 // MARK: - Enum Type
 /// String value taken from https://pokeapi.co/api/v2/type
-enum Type: String {
+enum Type: Int, CaseIterable, CustomStringConvertible {
 	case normal
 	case fire
 	case water
@@ -29,8 +29,58 @@ enum Type: String {
 	case dark
 	case steel
 	case fairy
-	case none = "unknown" // Renamed to none
+	case none // Renamed to none
 	case shadow // Probably unused
+	
+	init(_ value: String){
+		switch value.lowercased() {
+			case "normal": self = .normal
+			case "fire": self = .fire
+			case "water": self = .water
+			case "electric": self = .electric
+			case "grass": self = .grass
+			case "ice": self = .ice
+			case "fighting": self = .fighting
+			case "poison": self = .poison
+			case "ground": self = .ground
+			case "flying": self = .flying
+			case "psychic": self = .psychic
+			case "bug": self = .bug
+			case "rock": self = .rock
+			case "ghost": self = .ghost
+			case "dragon": self = .dragon
+			case "dark": self = .dark
+			case "steel": self = .steel
+			case "fairy": self = .fairy
+			case "shadow": self = .shadow
+			default: self = .none
+		}
+	}
+	
+	var description: String {
+		switch self {
+			case .normal: return "Normal"
+			case .fire: return "Fire"
+			case .water: return "Water"
+			case .electric: return "Electric"
+			case .grass: return "Grass"
+			case .ice: return "Ice"
+			case .fighting: return "Fighting"
+			case .poison: return "Poison"
+			case .ground: return "Ground"
+			case .flying: return "Flying"
+			case .psychic: return "Psychic"
+			case .bug: return "Bug"
+			case .rock: return "Rock"
+			case .ghost: return "Ghost"
+			case .dragon: return "Dragon"
+			case .dark: return "Dark"
+			case .steel: return "Steel"
+			case .fairy: return "Fairy"
+			case .none: return "Unknown" // Renamed to none
+			case .shadow: return "Shadow" // Probably unused
+		}
+	}
 }
 
 // MARK: - Enum EggGroup
@@ -84,16 +134,16 @@ enum GameVersion: String {
 	case moon
 	case ultrasun = "ultra-sun"
 	case ultramoon = "ultra-moon"
-	case sword // Currently unsupported by PokeAPI
-	case shield // Currently unsupported by PokeAPI
+	case sword
+	case shield
 }
 
 // MARK: - Enum Language
 /// String value taken from https://pokeapi.co/api/v2/language
 enum Language: String {
-	case ja_hrkt = "ja-hrkt" // Japanese Hiragana/Katakana
+	case ja_hrkt = "ja-Hrkt" // Japanese Hiragana/Katakana
 	case romaji = "roomaji"
-	case zh_hant = "zh-hant" // Chinese Traditional
+	case zh_hant = "zh-Hant" // Chinese Traditional
 	case fr
 	case de
 	case es
@@ -101,7 +151,7 @@ enum Language: String {
 	case en
 	case cs
 	case ja
-	case zh_hans = "zh-hans" // Chinese Simplified
+	case zh_hans = "zh-Hans" // Chinese Simplified
 	case pt_BR = "ptbr"
 }
 
@@ -162,14 +212,6 @@ func colorSelector(for type: Type) -> UIColor{
 	}
 }
 
-func getType(from string: String) -> Type {
-	if string.lowercased() == "notype" || string.lowercased() == "none" { return .none }
-	else {
-		if let type = Type(rawValue: string.lowercased()) { return type }
-		else { return .none }
-	}
-}
-
 // MARK: - StatBar Color Selector
 //TODO: Implement a gradient return
 func colorSelector(for stat: Int) -> UIColor {
@@ -179,24 +221,3 @@ func colorSelector(for stat: Int) -> UIColor {
 	if 100...999 ~= stat { return .green }
 	else { return .gray }
 }
-
-// MARK: - UIKit Extensions
-extension UILabel {
-	func roundedEdges(withSize size: CGFloat? = nil, mask: CACornerMask? = nil){
-		
-		self.clipsToBounds = true
-		layer.cornerRadius = size ?? frame.width*0.15
-		if mask != nil { layer.maskedCorners = mask! }
-	}
-}
-
-extension UIFont {
-	func toggleBold(isBold: Bool) -> UIFont {
-		if isBold {
-			return UIFont.systemFont(ofSize: self.pointSize)
-		} else {
-			return UIFont.boldSystemFont(ofSize: self.pointSize)
-		}
-	}
-}
-

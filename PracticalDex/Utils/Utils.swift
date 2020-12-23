@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 func getDocumentsDirectory() -> URL {
 	let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -62,7 +63,6 @@ func fetchData<T: Decodable>(urlString: String, completion: @escaping (Result<T,
 
 //MARK: - Utility Functions
 func setUserDefaults() {
-	
 	let ud = UserDefaults.standard
 	ud.set(true, forKey: K.App.Defaults.hasLaunchedBefore)
 	
@@ -76,6 +76,8 @@ func setUserDefaults() {
 	ud.set(0, forKey: K.App.Defaults.selectedBGMIndex)
 	ud.set(K.App.wallpaperList.first, forKey: K.App.Defaults.selectedWallpaper)
 	ud.set(0, forKey: K.App.Defaults.selectedWallpaperIndex)
+	
+	ud.set(Language.en.rawValue, forKey: K.App.Defaults.selectedLanguage)
 }
 
 //MARK: - UIView Extension
@@ -88,6 +90,7 @@ extension UIView {
 		self.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 	}
 	
+	/// Creates a new imageview in the background
 	func addBackgroundImageView(usingImageNamed imageName: String, withFrame frame: CGRect = .zero){
 		
 		// Create a new imageview and configure its properties
@@ -119,6 +122,23 @@ extension UIView {
 		self.layer.cornerRadius = size
 		self.layer.maskedCorners = mask
 	}
-
 }
 
+// MARK: - UILabel Extensions
+extension UILabel {
+	func roundedEdges(withSize size: CGFloat? = nil, mask: CACornerMask? = nil){
+		self.clipsToBounds = true
+		layer.cornerRadius = size ?? frame.width*0.15
+		if mask != nil { layer.maskedCorners = mask! }
+	}
+}
+
+extension UIFont {
+	func toggleBold(isBold: Bool) -> UIFont {
+		if isBold {
+			return UIFont.systemFont(ofSize: self.pointSize)
+		} else {
+			return UIFont.boldSystemFont(ofSize: self.pointSize)
+		}
+	}
+}

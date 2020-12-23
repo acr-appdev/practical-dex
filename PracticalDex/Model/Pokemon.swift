@@ -14,13 +14,12 @@ import RealmSwift
 
 /// Represents a specific, particular instance of pokémon, eg.: Marowak vs Marowak-Alola
 struct Pokemon {
-	let identifier: String // UUID().uuidString
 	let name: String
 	let number: Int
 	var sprites: SpriteImages // Sprites require additional Networking to fetch the images, thus they're declared as variables.
 	let primaryType: Type
 	let secondaryType: Type?
-	let abilities: [Ability]
+	var abilities: [Int : Ability]
 	let height: Measurement<UnitLength>
 	let weight: Measurement<UnitMass>
 	let stats: Stats
@@ -28,16 +27,19 @@ struct Pokemon {
 	
 	/// Create a placeholder pokemon
 	init(){
-		self.identifier = UUID().uuidString
 		self.name = "Missingno"
 		self.number = 0
 		let img = UIImage(named: "placeholder-missingno")
 		self.sprites = SpriteImages(male: img!)
 		self.primaryType = .none
 		self.secondaryType = nil
-		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
-						  Ability(name: "Ability 2", isHidden: false, slot: 2),
-						  Ability(name: "Hidden Ability", isHidden: true, slot: 3)]
+		let ability1 = Ability(name: "Ability 1", isHidden: false, slot: 1)
+		let ability2 = Ability(name: "Ability 2", isHidden: false, slot: 2)
+		let ability3 = Ability(name: "Hidden Ability", isHidden: true, slot: 3)
+		self.abilities = [:]
+		self.abilities[ability1.slot] = ability1
+		self.abilities[ability2.slot] = ability2
+		self.abilities[ability3.slot] = ability3
 		self.height = Measurement(value: 69, unit: UnitLength.meters)
 		self.weight = Measurement(value: 420, unit: UnitMass.grams)
 		self.stats = Stats(base: BaseStats())
@@ -46,26 +48,18 @@ struct Pokemon {
 	
 	/// Create a pokemon using PokeAPI data
 	init(withData pkmnData: PokemonData){
-		self.identifier = UUID().uuidString
 		self.name = pkmnData.name.capitalized
 		self.number = pkmnData.id
 		
-		self.primaryType = Type(rawValue: pkmnData.types[0].type.name) ?? Type.none
-		//self.primaryType = typeSelector(pkmnData.types[0])
+		self.primaryType = Type(pkmnData.types[0].type.name)
+		
 		if pkmnData.types.count > 1 {
-			self.secondaryType = Type(rawValue: pkmnData.types[1].type.name.lowercased())
+			self.secondaryType = Type(pkmnData.types[1].type.name)
 		} else {
 			self.secondaryType = nil
 		}
 		
-		var abilitySet: [Ability] = []
-		pkmnData.abilities.forEach({ability in
-			let abilityName = ability.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
-			abilitySet.append(Ability(name: abilityName, isHidden: ability.is_hidden, slot: ability.slot))
-		})
-		self.abilities = abilitySet
-		
-		let weightInGrams = Double(pkmnData.weight)*100 // Alternatively, create an extension on UnitMass to implement .hectograms
+		let weightInGrams = Double(pkmnData.weight)*100 // Alternatively, create an extension on UnitMass to implement .hectograms (PokeAPI uses Hectograms)
 		self.weight = Measurement(value: weightInGrams, unit: UnitMass.grams)
 		self.height = Measurement(value: Double(pkmnData.height), unit: UnitLength.decimeters)
 		
@@ -86,38 +80,59 @@ struct Pokemon {
 		// This should be the last part initialized because we have to retrieve the data from another url
 		var defaultSprite = UIImage(named: K.Design.Image.pkmnSpritePlaceholder)!
 		self.sprites = SpriteImages(male: defaultSprite) // Assign a placeholder
+		
 		if let imageURL = URL(string: pkmnData.sprites.front_default){
-			//TODO: Probably should fire this code from a DispatchQueue Async and either reload the tableview whenever it returns or freeze the background
+			
 			if let imageData = try? Data(contentsOf: imageURL){
 				defaultSprite = UIImage(data: imageData)!
 			}
 		}
 		self.sprites = SpriteImages(male: defaultSprite)
+		
+		self.abilities = [:]
+		pkmnData.abilities.forEach({ abilityData in
+			let abilityName = abilityData.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
+			let newAbility = Ability(name: abilityName, isHidden: abilityData.is_hidden, slot: abilityData.slot)
+			
+			self.abilities[newAbility.slot] = newAbility
+		})
+		
 		self.species = nil
 	}
 }
 
+//MARK: -- PROTOCOLS --
+extension Pokemon: Hashable {
+	static func == (lhs: Pokemon, rhs: Pokemon) -> Bool {
+		return lhs.number == rhs.number
+	}
+	
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(self.number)
+	}
+}
+
+
 // MARK: Realm Object Extension
 extension Pokemon: Persistable {
-
+	
 	public init(managedObject: PokemonObject) {
-		identifier = managedObject.identifier
 		name = managedObject.name
 		number = managedObject.number
 		
 		height = Measurement(value: managedObject.height, unit: UnitLength.meters)
 		weight = Measurement(value: managedObject.weight, unit: UnitMass.kilograms)
 		
-		primaryType = getType(from: managedObject.primaryType)
-		let type = getType(from: managedObject.secondaryType)
+		primaryType = Type(managedObject.primaryType)
+		let type = Type(managedObject.secondaryType)
 		secondaryType = type != .none ? type : nil
-
+		
 		let baseStats = BaseStats(hp: managedObject.stat_hp,
-								 atk: managedObject.stat_atk,
-								 def: managedObject.stat_def,
-								 spa: managedObject.stat_spa,
-								 spd: managedObject.stat_spd,
-								 spe: managedObject.stat_spe)
+								  atk: managedObject.stat_atk,
+								  def: managedObject.stat_def,
+								  spa: managedObject.stat_spa,
+								  spd: managedObject.stat_spd,
+								  spe: managedObject.stat_spe)
 		stats = Stats(base: baseStats)
 		
 		let imageURL = getDocumentsDirectory().appendingPathComponent(K.App.spritesFolder).appendingPathComponent(managedObject.sprite_front)
@@ -127,72 +142,27 @@ extension Pokemon: Persistable {
 			sprites = SpriteImages(male: #imageLiteral(resourceName: "Missingno."))
 		}
 		
-//		self.abilities = [Ability(name: managedObject.ability1, isHidden: managedObject.ability1_isHidden, slot: 1),
-//						  Ability(name: managedObject.ability2, isHidden: managedObject.ability2_isHidden, slot: 2),
-//						  Ability(name: managedObject.ability3, isHidden: managedObject.ability3_isHidden, slot: 3)]
+		// TODO: - Rework Abilities
+		abilities = [:]
+		abilities[1] = Ability(name: managedObject.ability1, isHidden: managedObject.ability1_isHidden, slot: 1)
+		if managedObject.ability2 != "" {
+			abilities[2] = Ability(name: managedObject.ability2, isHidden: managedObject.ability2_isHidden, slot: 2)
+		}
+		if managedObject.ability3 != "" {
+			abilities[2] = Ability(name: managedObject.ability3, isHidden: managedObject.ability3_isHidden, slot: 3)
+		}
 		
-		self.abilities = [Ability(name: "Ability 1", isHidden: false, slot: 1),
-						  Ability(name: "Ability 2", isHidden: false, slot: 2),
-						  Ability(name: "Hidden Ability", isHidden: true, slot: 3)]
+		let matchNumberPredicate = NSPredicate(format: "number == \(number)")
 		self.species = nil
+		DataService.shared.retrieve(Species.self, predicate: matchNumberPredicate, completion: { (retrievedList) in
+			self.species = retrievedList.first
+		})
 		
 	}
-
+	
 	/// Returns the Realm Object implementation for the class.
 	func managedObject() -> PokemonObject {
 		let pokemonObject = PokemonObject(pokemon: self)
 		return pokemonObject
 	}
 }
-
-// MARK: Extra Structs Definition
-
-/// Provides pokémon sprites
-struct SpriteImages {
-	let male: UIImage
-	// let female: UIImage
-	// let shinyMale: UIImage
-	// let shinyFemale: UIImage
-	// let male_back: UIImage
-	// let female_back: UIImage
-	// let shinyMale_back: UIImage
-	// let shinyFemale_back: UIImage
-	
-}
-
-/// Provides pokémon stat data, related to calculating damage (calc function)
-struct Stats {
-	let base: BaseStats
-	// let evs: EffortValues
-	// let ivs: IndividualValues
-	
-	init(base: BaseStats = BaseStats.init()) {
-		self.base = base
-	}
-}
-
-/// Stores the base stats for a given pokémon, ranging from
-struct BaseStats {
-	let hp: Int
-	let atk: Int
-	let def: Int
-	let spa: Int
-	let spd: Int
-	let spe: Int
-	
-	init(hp: Int = Int.random(in: 1...255), atk: Int = Int.random(in: 1...255), def: Int = Int.random(in: 1...255), spa: Int = Int.random(in: 1...255), spd: Int = Int.random(in: 1...255), spe: Int = Int.random(in: 1...255)){
-		
-		self.hp = hp
-		self.atk = atk
-		self.def = def
-		self.spa = spa
-		self.spd = spd
-		self.spe = spe
-	}
-	
-	/// Returns the Base Stat Total for this pokémon
-	func bst() -> Int {
-		return (hp+atk+def+spa+spd+spe)
-	}
-}
-

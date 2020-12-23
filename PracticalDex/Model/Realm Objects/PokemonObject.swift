@@ -9,10 +9,8 @@
 import RealmSwift
 
 final class PokemonObject: Object {
-	
-	@objc dynamic var identifier: String = UUID().uuidString
-	@objc dynamic var name: String = ""
 	@objc dynamic var number: Int = 0
+	@objc dynamic var name: String = ""
 	
 	@objc dynamic var primaryType: String = ""
 	@objc dynamic var secondaryType: String = ""
@@ -48,24 +46,21 @@ final class PokemonObject: Object {
 	
 	convenience init(pokemon: Pokemon) {
 		self.init()
-		identifier = pokemon.identifier
 		name = pokemon.name
 		number = pokemon.number
 		
-		primaryType = pokemon.primaryType.rawValue
-		secondaryType = pokemon.secondaryType?.rawValue ?? ""
+		primaryType = pokemon.primaryType.description
+		secondaryType = pokemon.secondaryType?.description ?? ""
 		
 		height = pokemon.height.converted(to: .meters).value
 		weight = pokemon.weight.converted(to: .kilograms).value
 		
-		/*
-		ability1 = pokemon.abilities[0].name
-		ability1_isHidden = pokemon.abilities[0].isHidden
-		ability2 = pokemon.abilities[1].name
-		ability2_isHidden = pokemon.abilities[1].isHidden
-		ability3 = pokemon.abilities[2].name
-		ability3_isHidden = pokemon.abilities[2].isHidden
-		*/
+		ability1 = pokemon.abilities[1]?.name ?? ""
+		ability1_isHidden = ((pokemon.abilities[1]?.isHidden) != nil)
+		ability2 = pokemon.abilities[2]?.name ?? ""
+		ability2_isHidden = ((pokemon.abilities[2]?.isHidden) != nil)
+		ability3 = pokemon.abilities[3]?.name ?? ""
+		ability3_isHidden = ((pokemon.abilities[3]?.isHidden) != nil)
 
 		stat_hp  = pokemon.stats.base.hp
 		stat_atk = pokemon.stats.base.atk
@@ -77,9 +72,7 @@ final class PokemonObject: Object {
 		if let sprite_frontURL = saveImage(pokemon.sprites.male, named: "\(pokemon.name)_front", toFolder: K.App.spritesFolder) {
 			sprite_front = sprite_frontURL.lastPathComponent
 		}
-		
-//		species = SpeciesObject(withSpecies: pokemon.species ?? Species())
-	}
+}
 	
 	//MARK: - Private Methods
 	

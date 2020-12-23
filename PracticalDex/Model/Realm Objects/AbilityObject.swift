@@ -9,8 +9,6 @@
 import RealmSwift
 
 final class AbilityObject: Object {
-	
-	@objc dynamic var identifier: String = UUID().uuidString
 	@objc dynamic var name: String = ""
 	@objc dynamic var isHidden: Bool = false
 

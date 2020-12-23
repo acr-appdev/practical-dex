@@ -12,10 +12,17 @@ import UIKit
 class PokemonViewController: UIViewController {
 
 	var pokemon: Pokemon = Pokemon()
+	var selectedLanguage = Language(rawValue: UserDefaults.standard.value(forKey: K.App.Defaults.selectedLanguage) as! String) ?? .en
 	
     override func viewDidLoad() {
         super.viewDidLoad()
     }
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		selectedLanguage = Language(rawValue: UserDefaults.standard.value(forKey: K.App.Defaults.selectedLanguage) as! String) ?? .en
+	}
     
 	init(pokemon pkmn: Pokemon){
 		pokemon = pkmn

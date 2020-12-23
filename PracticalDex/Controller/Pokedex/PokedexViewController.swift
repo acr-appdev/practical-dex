@@ -27,7 +27,8 @@ class PokedexViewController: UIViewController {
 				settingsVC.settingsDelegate = self
 			}
 		}
-
+		
+		//pokedexManager.populatePokedex(fromNumber: 0, toNumber: 1)
 		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 31)
 		//pokedexManager.populatePokedex(entriesLimit: 151, offset: 0)
 		//pokedexManager.populatePokedex(entriesLimit: 800, offset: 0)
@@ -51,23 +52,32 @@ class PokedexViewController: UIViewController {
 // MARK: -- PROTOCOLS --
 // MARK: PokedexManagerDelegate
 extension PokedexViewController: PokedexManagerDelegate {
-	func didFinishPopulatingPokedex(_ pokedexManager: PokedexManager) {
-		
-		pokedexManager.pkmnGroup.notify(queue: .main, execute: {
-			self.pokedexManager.pokemonList.sort(by: {$0.number < $1.number})
-			pokedexManager.persist()
+	func didFinishFetchingSpecies(_ pokedexManager: PokedexManager) {
+		pokedexManager.updateFetchStatus(.Species)
+		pokedexManager.spcsGroup.notify(queue: .main, execute: {
+			print("DID FINISH FETCHING SPECIES")
+			self.pokedexManager.persist(speciesList: true)
+		})
+	}
+	
+	func didFinishFetchingPokemon(_ pokedexManager: PokedexManager) {
+		pokedexManager.updateFetchStatus(.Pokemon)
+		pokedexManager.pkmnGroup.notify(queue: .main, execute: {			
+			print("DID FINISH FETCHING POKEMON")
+			pokedexManager.persist(pokemonList: true)
 			self.collectionView.reloadData()
 		})
 	}
 	
 	func didFailWithError(_ error: Error) {
-		// handle possible errors
+		// handle possible errors - e.g. present popups with infos regarding error and possible solutions
+		// internet connection error
 	}
 	
+	// Used to update the pokedex as each entry is added
 	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
 		// DispatchQueue is used in order to free the main thread while data is fetched, so the app isn't frozen
 		DispatchQueue.main.async {
-			self.pokedexManager.pokemonList.sort(by: {$0.number < $1.number})
 			self.collectionView.reloadData()
 		}
 	}
@@ -88,7 +98,7 @@ extension PokedexViewController: SettingsDelegate {
 
 // MARK: CollectionView Delegate & DataSource
 extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-
+	
 	func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return 1
 	}
@@ -100,16 +110,28 @@ extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataS
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		var cell = UICollectionViewCell()
 		if let pokedexCell = collectionView.dequeueReusableCell(withReuseIdentifier: K.App.View.Cell.pokedex, for: indexPath) as? PokedexCell {
-
-			pokedexCell.configure(with: pokedexManager.pokemonList[indexPath.row])
+			
+			// indexPath.row is zero indexed, pokémon numbers are 1 indexed
+			if let cellPokemon = pokedexManager.pokemonList[indexPath.row+1] {
+				pokedexCell.configure(with: cellPokemon)
+			}
 			cell = pokedexCell
 		}
 		return cell
 	}
-
+	
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		let pokemon = pokedexManager.pokemonList[indexPath.row]
-		selectedPokemon = pokemon
+		// indexPath.row is zero indexed, pokémon numbers are 1 indexed
+		var pokemon = pokedexManager.pokemonList[indexPath.row+1]
+		
+		// TODO: REVIEW WHERE SHOULD THIS GO
+		for species in pokedexManager.speciesList {
+			if species.number == pokemon?.number {
+				pokemon?.species = species
+				break
+			}
+		}
+		selectedPokemon = pokemon ?? Pokemon()
 		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)
 	}
 }
