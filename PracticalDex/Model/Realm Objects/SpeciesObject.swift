@@ -8,14 +8,24 @@
 
 import RealmSwift
 
+/**
+Stores a Realm object of the *Species* class.
+
+- **generaPropertyName**: Used to refer to the Attribute `genera`
+- **generaAsArray**: Get `genera` as `Array`
+- **textEntriesPropertyName**: Used to refer to the attribute `flavorTextEntries`
+*/
 final class SpeciesObject: Object {
+	// TODO: Check if PropertyName / AsArray solution can be refactored into a RealmSwift extension (getArray is an extension defined in Persistable)
 	@objc dynamic var number: Int = 0
 	@objc dynamic var name: String = ""
 	@objc dynamic var genderRate: Double = -1
 	let genera = List<GenusObject>()
 	static let generaPropertyName = "genera"
+	var generaAsArray: [Genus] { get { return getArray(fromPropertyType: Genus.self, named: SpeciesObject.generaPropertyName) } }
 	let flavorTextEntries = List<FlavorTextEntryObject>()
 	static let textEntriesPropertyName = "flavorTextEntries"
+	var flavorTextAsArray: [FlavorTextEntry] { get { return getArray(fromPropertyType: FlavorTextEntry.self, named: SpeciesObject.textEntriesPropertyName) } }
 	
 //	@objc dynamic var baseHappiness: Int = 0
 //	@objc dynamic var captureRate: Int = 0
@@ -38,65 +48,5 @@ final class SpeciesObject: Object {
 		name = species.name
 		genderRate = species.genderRate ?? -1
 	}
-	
-	func getGenera() -> [Genus] {
-		let generaObjectArray = Array(genera)
-		var generaArray: [Genus] = []
-		generaObjectArray.forEach({ genusObject in
-			generaArray.append( Genus(managedObject: genusObject) )
-		})
-		
-//		print("---- GETGENERA YIELDS: ----")
-//		generaArray.forEach { k in
-//			print("[\(k.language)] \(k.genusDescription)")
-//		}
-		return generaArray
-	}
-	
-	func getTextEntries() -> [FlavorTextEntry] {
-		var returnArray: [FlavorTextEntry] = []
-		let realmObjectArray = Array(flavorTextEntries)
-		
-		realmObjectArray.forEach({ object in
-			let newItem = FlavorTextEntry(managedObject: object)
-			returnArray.append(newItem)
-		})
-		
-		return returnArray
-	}
-	
-	/* TODO: Create generic version of getArray
-	func getArray<T: Persistable>(ofProperty property: String) -> Any {
-		let realmObjectArray = Array(\.property)
-		
-		var returnArray: [T] = []
-		
-		realmObjectArray.forEach({ object in
-			
-			let newItem = T(managedObject: object)
-			
-			returnArray.append(newItem)
-		})
-
-		return returnArray
-	}
-	*/
 }
 
-class GenusObject: Object {
-	@objc dynamic var genusDescription: String = ""
-	@objc dynamic var language: String = ""
-	let ofSpecies = LinkingObjects(fromType: SpeciesObject.self, property: SpeciesObject.generaPropertyName)
-}
-
-class FlavorTextEntryObject: Object {
-	@objc dynamic var flavorTextDescription: String = ""
-	@objc dynamic var language: String = ""
-	@objc dynamic var version: String = ""
-	let ofSpecies = LinkingObjects(fromType: SpeciesObject.self, property: SpeciesObject.textEntriesPropertyName)
-}
-
-class LocalizedNameObject: Object {
-	@objc dynamic var name: String = ""
-	@objc dynamic var language: String = ""
-}

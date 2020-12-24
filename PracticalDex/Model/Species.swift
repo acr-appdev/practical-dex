@@ -140,14 +140,15 @@ extension Species: Persistable {
 		genderRate = managedObject.genderRate
 		
 		var newGenera: [Language : Genus] = [:]
-		let retrievedGenera = managedObject.getGenera()
+		// let retrievedGenera = managedObject.getGenera()
+		let retrievedGenera = managedObject.generaAsArray
 		retrievedGenera.forEach { (genus) in
 			newGenera[genus.language] = genus
 		}
 		genera = newGenera
 		
 		var newTextEntries: [Language : FlavorTextEntry] = [:]
-		let retrievedTextEntries = managedObject.getTextEntries()
+		let retrievedTextEntries = managedObject.flavorTextAsArray
 		retrievedTextEntries.forEach { (textEntry) in
 			newTextEntries[textEntry.language] = textEntry
 		}
@@ -161,8 +162,6 @@ extension Species: Persistable {
 		//		generation = .i
 		
 		//		eggGroups = managedObject.eggGroups
-		//		flavorTextEntries = managedObject.flavorTextEntries
-		//		genera = managedObject.genera
 		//		generation = managedObject.generation
 		
 		//		growthRate = managedObject.growthRate
@@ -180,11 +179,12 @@ extension Species: Persistable {
 		speciesObject.number = number
 		speciesObject.name = name
 		speciesObject.genderRate = genderRate ?? -1
+		
 		genera.forEach { (lang, genus) in
 			let newGenus = GenusObject()
 			newGenus.genusDescription = genus.genusDescription
 			newGenus.language = lang.rawValue
-			// print("Storing: [\(newGenus.language)] \(newGenus.genusDescription)")
+			
 			speciesObject.genera.append(newGenus)
 		}
 		
@@ -196,9 +196,6 @@ extension Species: Persistable {
 			
 			speciesObject.flavorTextEntries.append(newTextEntry)
 		}
-		
-		//		speciesObject.flavorTextEntries = flavorTextEntries
-		//		speciesObject.genera = genera
 		
 		//		speciesObject.baseHappiness = baseHappiness
 		//		speciesObject.captureRate = captureRate

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1B6F365932F12B97F57C98FE /* Pods_PracticalDex.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3536732C429F73B89DACB823 /* Pods_PracticalDex.framework */; };
+		AC035C2B2593FF0900CC096D /* PokemonDataTextObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC035C2A2593FF0900CC096D /* PokemonDataTextObjects.swift */; };
 		AC03EEE124BA5912002DE350 /* Pokemon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC03EEE024BA5912002DE350 /* Pokemon.swift */; };
 		AC03EEE424BA593B002DE350 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC03EEE324BA593B002DE350 /* Constants.swift */; };
 		AC03EEE724BA7437002DE350 /* PokedexManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC03EEE624BA7437002DE350 /* PokedexManager.swift */; };
@@ -58,6 +59,7 @@
 /* Begin PBXFileReference section */
 		1253F76B7EAB3BC407DDFABF /* Pods-PracticalDex.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PracticalDex.release.xcconfig"; path = "Target Support Files/Pods-PracticalDex/Pods-PracticalDex.release.xcconfig"; sourceTree = "<group>"; };
 		3536732C429F73B89DACB823 /* Pods_PracticalDex.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PracticalDex.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC035C2A2593FF0900CC096D /* PokemonDataTextObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonDataTextObjects.swift; sourceTree = "<group>"; };
 		AC03EEE024BA5912002DE350 /* Pokemon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pokemon.swift; sourceTree = "<group>"; };
 		AC03EEE324BA593B002DE350 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		AC03EEE624BA7437002DE350 /* PokedexManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokedexManager.swift; sourceTree = "<group>"; };
@@ -153,12 +155,12 @@
 			children = (
 				ACE4654224CBA8BA0063A02C /* API Models */,
 				AC66E37A24D1374C00B47555 /* Realm Objects */,
+				ACFD2CE6257FEBA900BB87EB /* Supporting Classes */,
 				AC03EEE024BA5912002DE350 /* Pokemon.swift */,
 				ACF9F30924CE60A8004B0BB0 /* Species.swift */,
 				AC5C16D324FE895900D19F25 /* Ability.swift */,
 				AC03EEE624BA7437002DE350 /* PokedexManager.swift */,
 				AC54F19E2511582D00F41F6F /* SettingsSection.swift */,
-				ACFD2CE6257FEBA900BB87EB /* Supporting Classes */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -204,6 +206,7 @@
 				AC502BCA24D32102008EA626 /* SpeciesObject.swift */,
 				AC5C16D524FE8ACD00D19F25 /* AbilityObject.swift */,
 				ACB4FE8C24EDC04B00D75CA2 /* Persistable.swift */,
+				AC035C2A2593FF0900CC096D /* PokemonDataTextObjects.swift */,
 			);
 			path = "Realm Objects";
 			sourceTree = "<group>";
@@ -453,6 +456,7 @@
 				ACFD2CE8257FEBE100BB87EB /* SpriteImages.swift in Sources */,
 				ACE89A9F256411E600651A73 /* MusicPlayer.swift in Sources */,
 				ACFD2CEB257FEC3100BB87EB /* PokemonTextData.swift in Sources */,
+				AC035C2B2593FF0900CC096D /* PokemonDataTextObjects.swift in Sources */,
 				AC502BCB24D32102008EA626 /* SpeciesObject.swift in Sources */,
 				AC03EEE924BA745D002DE350 /* PokemonData.swift in Sources */,
 				ACF9F30A24CE60A8004B0BB0 /* Species.swift in Sources */,

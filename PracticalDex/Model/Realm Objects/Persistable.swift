@@ -20,3 +20,20 @@ public protocol Persistable {
 	func managedObject() -> ManagedObject
 	
 }
+
+extension Object {
+	func getArray<T:Persistable>(fromPropertyType type: T.Type, named name: String) -> [T] {
+		let realmListProperty = self.value(forKey: name) as! RealmSwift.List<T.ManagedObject>
+		//print(realmListProperty)
+		let realmObjectArray = Array(realmListProperty)
+		
+		var returnArray: [T] = []
+		
+		realmObjectArray.forEach({ object in
+			let newItem = T(managedObject: object)
+			returnArray.append(newItem)
+		})
+
+		return returnArray
+	}
+}
