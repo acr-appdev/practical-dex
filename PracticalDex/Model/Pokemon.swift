@@ -5,18 +5,33 @@
 //  Created by Allan Rosa on 11/07/20.
 //  Copyright © 2020 Allan Rosa. All rights reserved.
 //
-//  This class represents a specific pokemon, such as Marowak or Marowak-Alola
-//  Marowak and his Alola form both share the same Species, but are different Pokemon
-//  Which results in different stats, abilities, moves, sprites, among other smaller factors such as weight and height
 
 import UIKit
 import RealmSwift
 
-/// Represents a specific, particular instance of pokémon, eg.: Marowak vs Marowak-Alola
+/**
+Represents a specific, particular instance of pokémon, eg.: _Marowak_ vs _Marowak-Alola_
+
+This class represents a specific pokemon, such as *Marowak* or *Marowak-Alola*.
+Marowak and his Alola form both share the same Species, but are different Pokemon, which results in different stats, abilities, moves, sprites, among other smaller factors such as weight and height.
+
+- **Attributes**:
+	- `name`: The pokemon name.
+	- `number`: The pokemon number, according National Dex.
+	- `sprites`:  An object holding the pokemon sprites (Male,Female,Shiny,Front,Back)
+	- `primaryType`:  The pokemon Primary type
+	- `secondaryType`: The pokemon Secondary type, or nil if it doesn't have one
+	- `abilities`:  A dictionary mapping `Abilities` to their slots
+	- `height`: The pokemon height.
+	- `weight`: The pokemon weight.
+	- `stats`:  The pokemon `Stats`data, includes base stats only.
+	- `species`: The pokemon `Species`.
+*/
 struct Pokemon {
+	// NOTE: Some attributes are declared as variables because they require some kind of parsing to be done or involves a relationship.
 	let name: String
 	let number: Int
-	var sprites: SpriteImages // Sprites require additional Networking to fetch the images, thus they're declared as variables.
+	var sprites: SpriteImages
 	let primaryType: Type
 	let secondaryType: Type?
 	var abilities: [Int : Ability]
@@ -25,7 +40,7 @@ struct Pokemon {
 	let stats: Stats
 	var species: Species?
 	
-	/// Create a placeholder pokemon
+	/// Create a  pokemon with dummy data (Missingno)
 	init(){
 		self.name = "Missingno"
 		self.number = 0
@@ -52,7 +67,6 @@ struct Pokemon {
 		self.number = pkmnData.id
 		
 		self.primaryType = Type(pkmnData.types[0].type.name)
-		
 		if pkmnData.types.count > 1 {
 			self.secondaryType = Type(pkmnData.types[1].type.name)
 		} else {
@@ -63,32 +77,35 @@ struct Pokemon {
 		self.weight = Measurement(value: weightInGrams, unit: UnitMass.grams)
 		self.height = Measurement(value: Double(pkmnData.height), unit: UnitLength.decimeters)
 		
+		// Using a dictionary to parse Stat data
 		let hp_string = "hp"
 		let atk_string = "attack"
 		let def_string = "defense"
 		let spa_string = "special-attack"
 		let spd_string = "special-defense"
 		let spe_string = "speed"
-		var baseStats = [hp_string : 0, atk_string : 0, def_string : 0, spa_string : 0, spd_string : 0, spe_string : 0]
 		
+		var baseStats: [String:Int] = [:]
 		pkmnData.stats.forEach({ stat in
 			baseStats[stat.stat.name.lowercased()] = stat.base_stat
 		})
+		
 		let bs = BaseStats(hp: baseStats[hp_string]!, atk: baseStats[atk_string]!, def: baseStats[def_string]!, spa: baseStats[spa_string]!, spd: baseStats[spd_string]!, spe: baseStats[spe_string]!)
 		self.stats = Stats(base: bs)
-		
-		// This should be the last part initialized because we have to retrieve the data from another url
+	
+		// Assign a default placeholder image until the image fetch request receives its response
 		var defaultSprite = UIImage(named: K.Design.Image.pkmnSpritePlaceholder)!
-		self.sprites = SpriteImages(male: defaultSprite) // Assign a placeholder
+		self.sprites = SpriteImages(male: defaultSprite)
 		
+		// Fetch the image
 		if let imageURL = URL(string: pkmnData.sprites.front_default){
-			
 			if let imageData = try? Data(contentsOf: imageURL){
 				defaultSprite = UIImage(data: imageData)!
 			}
 		}
 		self.sprites = SpriteImages(male: defaultSprite)
 		
+		// Assign abilities using a dictionary, mapping abilities to their slots
 		self.abilities = [:]
 		pkmnData.abilities.forEach({ abilityData in
 			let abilityName = abilityData.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
@@ -112,10 +129,8 @@ extension Pokemon: Hashable {
 	}
 }
 
-
 // MARK: Realm Object Extension
 extension Pokemon: Persistable {
-	
 	public init(managedObject: PokemonObject) {
 		name = managedObject.name
 		number = managedObject.number

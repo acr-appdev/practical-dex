@@ -9,6 +9,11 @@
 import Foundation
 import RealmSwift
 
+/**
+A `Persistable` class or struct must also implement a corresponding `ManagedObject` to be persisted in the Database, such as Realm.
+
+Define an `init` method that initializes the class from its `ManagedObject`, as well as a `managedObject()` function to return the `ManagedObject` to be stored in the database.
+*/
 public protocol Persistable {
 	/// **ManagedObject** inherits from Object, defined in RealmSwift framework
 	associatedtype ManagedObject: Object
@@ -22,18 +27,23 @@ public protocol Persistable {
 }
 
 extension Object {
+	/** Returns `RealmSwift.List` properties as plain Swift `Array`.
+	- Parameters:
+		- type: The object's property type which is declared as a `RealmSwift.List`.
+		- name: The name of the property.
+	- Returns: An Array of the informed property `type`.
+	*/
 	func getArray<T:Persistable>(fromPropertyType type: T.Type, named name: String) -> [T] {
 		let realmListProperty = self.value(forKey: name) as! RealmSwift.List<T.ManagedObject>
-		//print(realmListProperty)
+
 		let realmObjectArray = Array(realmListProperty)
-		
+
 		var returnArray: [T] = []
 		
 		realmObjectArray.forEach({ object in
 			let newItem = T(managedObject: object)
 			returnArray.append(newItem)
 		})
-
 		return returnArray
 	}
 }

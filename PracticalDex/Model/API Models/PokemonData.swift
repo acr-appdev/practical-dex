@@ -17,7 +17,8 @@ struct PokemonData: Decodable {
 	// let base_experience: Int
 	// let forms: [Form]
 	// let game_indices
-	let height: Int // in decimeters (1dm = 0.1m)
+	/// Measured in decimeters (1dm = 0.1m)
+	let height: Int
 	let id: Int // number
 	// let is_default: Boolean
 	// let location_area_encounters:
@@ -28,7 +29,8 @@ struct PokemonData: Decodable {
 	let sprites: Sprites
 	let stats: [StatsData]
 	let types: [TypeData]
-	let weight: Int // in hectograms (1hg = 100g = 0.1kg)
+	/// Measured in hectograms (1hg = 100g = 0.1kg)
+	let weight: Int
 }
 
 struct AbilityData: Decodable {
