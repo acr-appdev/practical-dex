@@ -23,24 +23,24 @@ class InfoPageViewController: UIPageViewController {
 		let statsVC = storyboard?.instantiateViewController(withIdentifier: K.App.View.statsVC) as! StatsViewController
 		statsVC.pokemon = self.pokemon
 		
-		return [aboutVC, evolutionVC, statsVC] // removed moves vc bc not in first version
+		// movesVC and evolutionVC arent implemented yet
+		return [aboutVC, statsVC]
+		
 	}()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-	
+		
 		self.dataSource = self
 		
 		guard let controllersFirst = viewControllerList.first else { return }
 		
 		setViewControllers([controllersFirst], direction: .forward, animated: true, completion: nil)
-		
-		// Do any additional setup after loading the view.
 	}
 }
 
 
-//MARK: - UIPageViewControllerDataSource
+//MARK: - PageView DataSource
 extension InfoPageViewController: UIPageViewControllerDataSource {
 	
 	func pageViewController(_ pageViewController: UIPageViewController,
@@ -76,5 +76,12 @@ extension InfoPageViewController: UIPageViewControllerDataSource {
 	
 	func presentationCount(for pageViewController: UIPageViewController) -> Int {
 		return viewControllerList.count
+	}
+}
+
+//MARK: - PageView Delegate
+extension InfoPageViewController: UIPageViewControllerDelegate{
+	func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+		
 	}
 }

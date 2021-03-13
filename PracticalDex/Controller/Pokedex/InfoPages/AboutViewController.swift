@@ -71,18 +71,8 @@ class AboutViewController: PokemonViewController {
 	}
 }
 
-// MARK: - Measurement Extension
-extension Measurement where UnitType == UnitLength {
+//MARK: - UIScrollViewDelegate
+extension AboutViewController: UIScrollViewDelegate{
 	
-	// Example format extension
-    private static let usFormatted: MeasurementFormatter = {
-       let formatter = MeasurementFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.unitOptions = .providedUnit
-        formatter.numberFormatter.maximumFractionDigits = 0
-        formatter.unitStyle = .long
-        return formatter
-    }()
-	
-    var usFormatted: String { Measurement.usFormatted.string(from: self) }
 }
+

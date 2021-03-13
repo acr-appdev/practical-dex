@@ -13,6 +13,10 @@ struct K {
 	struct Design {
 		struct Color {
 			static let menuLightBlue = UIColor(red: 55/255, green: 120/255, blue: 250/255, alpha: 1)
+			static let red = UIColor(named: "theme-red")
+			static let blue = UIColor(named: "theme-blue")
+			static let darkBlue = UIColor(named: "theme-darkblue")
+			static let white = UIColor(named: "theme-white")
 		}
 		struct Image {
 			static let pkmnSpritePlaceholder = "placeholder-missingno"
@@ -55,6 +59,7 @@ struct K {
 				static let pokedex = "PokedexCell"
 				static let settings = "SettingsCell"
 			}
+			static let headerSearchBar = "HeaderSearchBar"
 			static let infoPageVC = "InfoPageViewController"
 			static let aboutVC = "AboutVC"
 			static let evolutionVC = "EvolutionVC"

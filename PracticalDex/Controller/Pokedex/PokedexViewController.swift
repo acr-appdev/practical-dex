@@ -12,7 +12,8 @@ class PokedexViewController: UIViewController {
 	
 	private var selectedPokemon = Pokemon()
 	private var pokedexManager = PokedexManager()
-	private var searchController = UISearchController()
+	private var searchController = UISearchController(searchResultsController: nil)
+	
 	@IBOutlet weak var collectionView: UICollectionView!
 	
 	override func viewDidLoad() {
@@ -22,17 +23,25 @@ class PokedexViewController: UIViewController {
 		collectionView.delegate = self
 		collectionView.dataSource = self
 		
+		setupSearchBar()
+		
 		if let settingsNavVC = tabBarController?.viewControllers![1] as? UINavigationController {
 			if let settingsVC = settingsNavVC.topViewController as? SettingsViewController {
 				settingsVC.settingsDelegate = self
 			}
 		}
-		
+				
 		//pokedexManager.populatePokedex(fromNumber: 0, toNumber: 1)
-		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 31)
-		//pokedexManager.populatePokedex(entriesLimit: 151, offset: 0)
-		//pokedexManager.populatePokedex(entriesLimit: 800, offset: 0)
+		//pokedexManager.populatePokedex(fromNumber: 0, toNumber: 12)
+		//pokedexManager.populatePokedex(fromNumber: 0, toNumber: 31)
+		//pokedexManager.populatePokedex(fromNumber: 0, toNumber: 151)
+		pokedexManager.populatePokedex()
 		
+	}
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		setupSearchBarTextField()
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
@@ -40,30 +49,45 @@ class PokedexViewController: UIViewController {
 		collectionView.reloadData() // Updates cells to reflect changes done in settings
 	}
 	
-	// MARK: - Navigation
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		let destinationVC = segue.destination as! DetailViewController
 		collectionView.reloadData()
 		destinationVC.pokemon = selectedPokemon
 	}
 	
+	fileprivate func setupSearchBar(){
+		searchController.obscuresBackgroundDuringPresentation = true
+		searchController.searchResultsUpdater = self
+		searchController.searchBar.delegate = self
+		
+		searchController.searchBar.searchTextField.backgroundColor = K.Design.Color.blue
+		searchController.searchBar.searchTextField.textColor = K.Design.Color.white
+		searchController.searchBar.searchTextField.tintColor = K.Design.Color.red
+		searchController.searchBar.tintColor = K.Design.Color.red // cancel search button tint color
+		searchController.searchBar.placeholder = "Search Pokémon..."
+		
+		navigationItem.searchController = searchController
+		definesPresentationContext = true
+	}
+	
+	fileprivate func setupSearchBarTextField(){
+		searchController.searchBar.textField?.textColor = K.Design.Color.white
+		searchController.searchBar.changePlaceholderTextColor(to: K.Design.Color.white ?? .white)
+	}
 }
 
-// MARK: -- PROTOCOLS --
-// MARK: PokedexManagerDelegate
+// MARK: - PokedexManagerDelegate
 extension PokedexViewController: PokedexManagerDelegate {
 	func didFinishFetchingSpecies(_ pokedexManager: PokedexManager) {
-		pokedexManager.updateFetchStatus(.Species)
+		pokedexManager.updateFetchStatus(of: .Species)
 		pokedexManager.spcsGroup.notify(queue: .main, execute: {
-			print("DID FINISH FETCHING SPECIES")
 			self.pokedexManager.persist(speciesList: true)
 		})
 	}
 	
 	func didFinishFetchingPokemon(_ pokedexManager: PokedexManager) {
-		pokedexManager.updateFetchStatus(.Pokemon)
-		pokedexManager.pkmnGroup.notify(queue: .main, execute: {			
-			print("DID FINISH FETCHING POKEMON")
+		pokedexManager.updateFetchStatus(of: .Pokemon)
+		pokedexManager.pkmnGroup.notify(queue: .main, execute: {
 			pokedexManager.persist(pokemonList: true)
 			self.collectionView.reloadData()
 		})
@@ -75,7 +99,7 @@ extension PokedexViewController: PokedexManagerDelegate {
 	}
 	
 	// Used to update the pokedex as each entry is added
-	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon) {
+	func didUpdatePokedexData(_ pokedexManager: PokedexManager) {
 		// DispatchQueue is used in order to free the main thread while data is fetched, so the app isn't frozen
 		DispatchQueue.main.async {
 			self.collectionView.reloadData()
@@ -92,27 +116,36 @@ extension PokedexViewController: SettingsDelegate {
 	func resetData() {
 		pokedexManager.resetData(purgeDatabase: true)
 		collectionView.reloadData()
-		pokedexManager.populatePokedex(fromNumber: 0, toNumber: 51)
+		pokedexManager.populatePokedex()
 	}
 }
 
-// MARK: CollectionView Delegate & DataSource
-extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-	
+// MARK: - UICollectionViewDelegate
+extension PokedexViewController: UICollectionViewDelegate {
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		
+		let number = pokedexManager.pokemonKeys[indexPath.row]
+		let pokemon = pokedexManager.pokemonList[number]
+
+		selectedPokemon = pokemon ?? Pokemon()
+		print("Clicked on indexPath: \(indexPath.row) \n Performing segue with \(selectedPokemon.number): \(selectedPokemon.name)")
+		
+		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)
+	}
+}
+
+//MARK: - UICollectionViewDataSource
+extension PokedexViewController: UICollectionViewDataSource {
 	func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return 1
-	}
-	
-	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		return pokedexManager.pokemonList.count
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		var cell = UICollectionViewCell()
 		if let pokedexCell = collectionView.dequeueReusableCell(withReuseIdentifier: K.App.View.Cell.pokedex, for: indexPath) as? PokedexCell {
 			
-			// indexPath.row is zero indexed, pokémon numbers are 1 indexed
-			if let cellPokemon = pokedexManager.pokemonList[indexPath.row+1] {
+			let number = pokedexManager.pokemonKeys[indexPath.row]
+			if let cellPokemon = pokedexManager.pokemonList[number] {
 				pokedexCell.configure(with: cellPokemon)
 			}
 			cell = pokedexCell
@@ -120,19 +153,8 @@ extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataS
 		return cell
 	}
 	
-	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		// indexPath.row is zero indexed, pokémon numbers are 1 indexed
-		var pokemon = pokedexManager.pokemonList[indexPath.row+1]
-		
-		// TODO: REVIEW WHERE SHOULD THIS GO
-		for species in pokedexManager.speciesList {
-			if species.number == pokemon?.number {
-				pokemon?.species = species
-				break
-			}
-		}
-		selectedPokemon = pokemon ?? Pokemon()
-		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)
+	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+		return pokedexManager.pokemonKeys.count
 	}
 }
 
@@ -154,31 +176,36 @@ extension PokedexViewController: UICollectionViewDelegateFlowLayout {
 	}
 }
 
-//MARK: - SearchBarController & Delegate
-extension PokedexViewController: UISearchControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate {
-	func updateSearchResults(for searchController: UISearchController) {
-		let searchString = "<Search>"
-		print ("Search for : \(searchString) -> Updating...")
+//MARK: - SearchBarDelegate
+extension PokedexViewController: UISearchBarDelegate {
+	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+		if (!(searchBar.text?.isEmpty)!) {
+			//print("Search for: \(searchBar.text!)")
+			pokedexManager.filter(searchBar.text!)
+		}
+		else {
+			pokedexManager.restorePokemonList()
+		}
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-		self.dismiss(animated: true, completion: nil)
+		pokedexManager.restorePokemonList()
 	}
 	
-	func setupSearchBar(){
-		// SearchBar at the top
-		self.searchController = UISearchController(searchResultsController:  nil)
-		
-		self.searchController.searchResultsUpdater = self
-		self.searchController.delegate = self
-		self.searchController.searchBar.delegate = self
-		
-		self.searchController.hidesNavigationBarDuringPresentation = false
-		//self.searchController.dimsBackgroundDuringPresentation = true
-		self.searchController.obscuresBackgroundDuringPresentation = false
-		
-		searchController.searchBar.becomeFirstResponder()
-		
-		self.navigationItem.titleView = searchController.searchBar
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+		if (!(searchBar.text?.isEmpty)!) {
+			//print("Search for: \(searchBar.text!)")
+			pokedexManager.filter(searchBar.text!)
+		}
+		else {
+			pokedexManager.restorePokemonList()
+		}
+	}
+}
+
+// MARK: - UISearchResultsUpdating
+extension PokedexViewController: UISearchResultsUpdating {
+	func updateSearchResults(for searchController: UISearchController) {
+		// TODO
 	}
 }

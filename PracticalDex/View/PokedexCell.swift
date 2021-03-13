@@ -9,13 +9,11 @@
 import UIKit
 
 class PokedexCell: UICollectionViewCell {
-    
 	@IBOutlet private weak var nameLabel: UILabel!
 	@IBOutlet weak var spriteImageView: UIImageView!
 	@IBOutlet weak var backgroundImageView: UIImageView!
 	
 	func configure(with pokemon: Pokemon){
-		
 		// Set up the background image view
 		guard let bgImageName = UserDefaults.standard.string(forKey: K.App.Defaults.selectedWallpaper) else { return }
 		backgroundImageView.image = UIImage(named: bgImageName)

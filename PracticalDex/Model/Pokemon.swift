@@ -110,7 +110,6 @@ struct Pokemon {
 		pkmnData.abilities.forEach({ abilityData in
 			let abilityName = abilityData.ability.name.capitalized.replacingOccurrences(of: "-", with: " ")
 			let newAbility = Ability(name: abilityName, isHidden: abilityData.is_hidden, slot: abilityData.slot)
-			
 			self.abilities[newAbility.slot] = newAbility
 		})
 		

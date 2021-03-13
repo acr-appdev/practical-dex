@@ -22,7 +22,7 @@ struct Species {
 	//	let baseHappiness: Int
 	//	let captureRate: Int
 	//	let color: UIColor
-	//	let eggGroups: [EggGroup]
+	let eggGroups: [EggGroup]
 	//	let generation: Generation
 	//	let growthRate: String // https://pokeapi.co/api/v2/growth-rate/
 	//	let hasGenderDifferences: Bool
@@ -43,7 +43,7 @@ struct Species {
 		//		baseHappiness = 0
 		//		captureRate = 0
 		//		color = .white
-		//		eggGroups = []
+		eggGroups = []
 		//		generation = .i
 		//		growthRate = ""
 		//		hasGenderDifferences = false
@@ -79,55 +79,20 @@ struct Species {
 			// TODO: Handle Nil coalescing
 			let lang = Language(rawValue: element.language.name) ?? .en
 			let gameVer = GameVersion(rawValue: element.version.name) ?? .red
-			let newTextEntry = FlavorTextEntry(flavorTextDescription: element.flavor_text, language: lang, version: gameVer)
+			let text = element.flavor_text.trimmingCharacters(in: .newlines)
+			let newTextEntry = FlavorTextEntry(flavorTextDescription: text, language: lang, version: gameVer)
 			
 			newTextEntries[lang] = newTextEntry
 		}
 		flavorTextEntries = newTextEntries
 		
-		//		baseHappiness = speciesData.base_happiness
-		//		captureRate = speciesData.capture_rate
-		//		growthRate = speciesData.growth_rate.name
-		//		hasGenderDifferences = speciesData.has_gender_differences
-		//		hatchCounter = speciesData.hatch_counter
-		//		isBaby = speciesData.is_baby
-		
-		//TODO: Handle Nil coalescing in code below
-		//		color = UIColor(named: speciesData.color.name) ?? .black
-		//		generation = Generation(rawValue: speciesData.generation.name) ?? Generation.i
-		
-		//		var groups: [EggGroup] = []
-		//		speciesData.egg_groups.forEach({ element in
-		//			let newGroup = EggGroup(rawValue: element.name) ?? EggGroup.undiscovered
-		//			groups.append(newGroup)
-		//		})
-		//		eggGroups = groups
-		
-		//		var entries: [FlavorTextEntry] = []
-		//		speciesData.flavor_text_entries.forEach({ element in
-		//			let lang = Language(rawValue: element.language.name) ?? Language.en
-		//			let gver = GameVersion(rawValue: element.version.name) ?? GameVersion.red
-		//			let newEntry = FlavorTextEntry(description: element.flavor_text, language: lang, version: gver)
-		//			entries.append(newEntry)
-		//		})
-		//		flavorTextEntries = entries
-		
-		//		var newGenera: [Genus] = []
-		//		speciesData.genera.forEach({ element in
-		//			// TODO: Handle Nil coalescing
-		//			let lang = Language(rawValue: element.language.name) ?? Language.en
-		//			let newGenus = Genus(genus: element.genus, language: lang)
-		//			newGenera.append(newGenus)
-		//		})
-		//		genera = newGenera
-		
-		//		var localizedNames: [LocalizedName] = []
-		//		speciesData.names.forEach({ element in
-		//			let lang = Language(rawValue: element.language.name) ?? Language.en
-		//			let newName = LocalizedName(name: element.name, language: lang)
-		//			localizedNames.append(newName)
-		//		})
-		//		names = localizedNames
+		var newEggGroups: [EggGroup] = []
+		speciesData.egg_groups.forEach { (element) in
+			let name = element.name
+			let eggGroup = EggGroup(rawValue: name)
+			newEggGroups.append(eggGroup ?? .undiscovered)
+		}
+		eggGroups = newEggGroups
 	}
 }
 
@@ -154,7 +119,7 @@ extension Species: Persistable {
 		}
 		flavorTextEntries = newTextEntries
 		
-		
+		eggGroups = Array(_immutableCocoaArray: managedObject.eggGroups)
 		//		baseHappiness = managedObject.baseHappiness
 		//		captureRate = managedObject.captureRate
 		//		color = UIColor.black

@@ -8,12 +8,10 @@
 
 import UIKit
 import RealmSwift
-//import Network
 
 protocol PokedexManagerDelegate {
 	// The delegate pattern protocol's requirements
-	// didRetrievePokemon: Who updated the pokedex? What is the updated data?
-	func didRetrievePokemon(_ pokedexManager: PokedexManager, pokemon: Pokemon)
+	func didUpdatePokedexData(_ pokedexManager: PokedexManager)
 	func didFinishFetchingPokemon(_ pokedexManager: PokedexManager)
 	func didFinishFetchingSpecies(_ pokedexManager: PokedexManager)
 	func didFailWithError(_ error: Error)
@@ -27,44 +25,63 @@ class PokedexManager {
 	// MARK: -- ATTRIBUTES --
 	
 	var delegate: PokedexManagerDelegate?
-	
-	var pokemonList: [Int : Pokemon] = [:] // [pokemon.number : pokemon]
+	var pokemonList: [Int : Pokemon] = [:] // Maps each pokemon to their number for ease of access
+	var pokemonKeys: [Int] = [] // An array with the keys in pokemonList
 	let pkmnGroup = DispatchGroup()
 	private var pokemonFetchCounter = 0
 	var finishedFetchingPokemon = false
 	
-	var speciesList: [Species] = [] // [species.number : species]
+	var speciesList: [Species] = []
 	let spcsGroup = DispatchGroup()
 	private var speciesFetchCounter = 0
 	var finishedFetchingSpecies = false
 	
 	// MARK: -- FUNCTIONS --
+	// MARK: persist
 	/// This is a function used to persist data in case there was a call to the API to fetch data (NOTE: Realm complains if its called outside the main thread so this function is public in order to be accessed from the PokedexViewController, which runs on the main thread)
 	func persist(pokemonList savePokemonList: Bool = false, speciesList saveSpeciesList: Bool = false) {
 		if savePokemonList {
-//			print("===== Persisting Pokemon Data [\(pokemonList.count)] ======")
-//			pokemonList.forEach({ pkmn in print("[Pokemon] \(pkmn.value.name)") })
-//			print("============================")
-			
-			// Discarding the key value to store only the relevant data
+			// Discarding the dictionary key value to store only the relevant data
 			let lazyMapCollection = pokemonList.values
 			let pkmnArray = Array(lazyMapCollection)
-			
+			print("saving pokemon")
 			DataService.shared.create(pkmnArray)
 		}
 		
 		if saveSpeciesList {
-//			print("===== Persisting Species Data [\(speciesList.count)] ======")
-//			speciesList.forEach({species in print("[Species] \(species.name)") })
-//			print("============================")
-			
+			print("saving species")
 			DataService.shared.create(speciesList)
 		}
 	}
 	
+	// MARK: filter
+	/// This is a function used to filter the current pokemonList being displayed, using the informed string.
+	func filter(_ string: String){
+		// treat string to convert it to nspredicate
+		let predicate = NSPredicate(format: "name CONTAINS[cd] %@", string)
+		print("SEARCH FOR: \(string)")
+		pokemonKeys.removeAll()
+		DataService.shared.retrieve(Pokemon.self, predicate: predicate, sorted: nil) { (retrievedData) in
+			retrievedData.forEach { (pkmn) in
+				pokemonKeys.append(pkmn.number)
+				print(pkmn.name)
+			}
+		}
+		pokemonKeys.sort()
+		print("- END OF SEARCH RESULTS - ")
+		delegate?.didUpdatePokedexData(self)
+	}
+	
+	// MARK: restorePokemonList
+	/// Restores the displayed pokemonList to the original list with all entries
+	func restorePokemonList(){
+		pokemonKeys = Array(pokemonList.keys.sorted())
+		delegate?.didUpdatePokedexData(self)
+	}
+	
 	// MARK: - fetchPokemon (Many)
 	/**
-	Fetches pokémon within the range of offset, informing the delegate with the API call result, batch parameter is used to indicate if this method is being called by fetchPokemon fromNumber toNumber
+	Fetches pokémon within the range of offset, informing the delegate with the API call result.
 	*/
 	private func fetchPokemon(fromNumber offset: Int, toNumber limit: Int){
 		let urlString = "https://pokeapi.co/api/v2/pokemon?limit=\(limit)&offset=\(offset)"
@@ -93,14 +110,14 @@ class PokedexManager {
 	private func fetchPokemon(byName name: String, batch: Bool = false){
 		let urlString = "https://pokeapi.co/api/v2/pokemon/\(name)"
 
-		fetchData(urlString: urlString) { (result: Result<PokemonData, Error>) in
+		fetchData(urlString: urlString) { [self] (result: Result<PokemonData, Error>) in
 			switch result {
 				case .success(let pkmnData):
 					let pkmn = Pokemon(withData: pkmnData)
 					self.pokemonList[pkmn.number] = pkmn
-					// self.pokemonList.append(pkmn)
-					// This updates the data as it is retrieved
-					self.delegate?.didRetrievePokemon(self, pokemon: pkmn)
+					
+					// This line lets the data be updated as it is retrieved
+					self.delegate?.didUpdatePokedexData(self)
 					
 				case .failure(let error):
 					print("Failed to fetch pokemon by name (\(name)): ", error)
@@ -110,8 +127,11 @@ class PokedexManager {
 			if batch {
 				self.pkmnGroup.leave()
 				self.pokemonFetchCounter -= 1
+				
 				if self.pokemonFetchCounter == 0 {
-					self.pkmnGroup.leave() // .leave() an extra time to account for the .enter() on populatePokedex
+					// .leave() an extra time to account for the .enter() on populatePokedex
+					self.pkmnGroup.leave()
+					self.pokemonKeys = Array(self.pokemonList.keys.sorted())
 					self.delegate?.didFinishFetchingPokemon(self)
 				}
 			}
@@ -136,14 +156,12 @@ class PokedexManager {
 		} else if name != nil {
 			urlString = "https://pokeapi.co/api/v2/pokemon-species/\(name!)"
 		}
-		//print(urlString)
 		if urlString == "" { return }
 		
 		fetchData(urlString: urlString){ (result: Result<PokemonSpeciesData, Error>) in
 			switch result {
 				case .success(let pkmnData):
 					let specie = Species(withData: pkmnData)
-					//print("[Retrieved Species] #\(specie.number) - \(specie.name)")
 					self.speciesList.append(specie)
 				
 				case .failure(let error):
@@ -161,7 +179,7 @@ class PokedexManager {
 	/**
 	Updates the current status regarding data lists, linking relevant data.
 	*/
-	func updateFetchStatus(_ fetchable: PokedexManagerFetchable){
+	func updateFetchStatus(of fetchable: PokedexManagerFetchable){
 		switch fetchable {
 			case .Pokemon: finishedFetchingPokemon = true
 			case .Species: finishedFetchingSpecies = true
@@ -169,6 +187,7 @@ class PokedexManager {
 		
 		if finishedFetchingPokemon && finishedFetchingSpecies {
 			pokemonList.forEach { (key, pokemon) in
+				//speciesList is an array, which is zero indexed
 				pokemonList[key]?.species = speciesList[key-1]
 			}
 		}
@@ -189,11 +208,10 @@ class PokedexManager {
 	- Parameter limit: Upper Bound of the pokemon range to be fetched.
 	*/
 	func populatePokedex(fromNumber offset: Int = 0, toNumber limit: Int = 898){
-		// retrieve from database if populated, else fetch data from pokeAPI
-		
+		// Retrieve from database if populated, else fetch data from pokeAPI
 		let sortParameter = Sorted(key: "number", ascending: true)
 		DataService.shared.retrieve(Pokemon.self, sorted: sortParameter) { (retrievedList) in
-			// self.pokemonList = retrievedList
+			
 			retrievedList.forEach({ pkmn in
 				self.pokemonList[pkmn.number] = pkmn
 			})
@@ -201,16 +219,12 @@ class PokedexManager {
 		
 		DataService.shared.retrieve(Species.self, sorted: sortParameter) { (retrievedList) in
 			self.speciesList = retrievedList
-//			retrievedList.forEach({ pkmn in
-//				self.pokemonList[pkmn.number] = pkmn
-//			})
 		}
 		
+		// Check if the pokemonList.count is the correct amount of pokemon
 		let check = limit-offset
-		
-		print("Check: \(check) != Pkmn: \(self.pokemonList.count) != Spcs:  \(self.speciesList.count)")
 		if self.pokemonList.count != check || self.speciesList.count != check {
-			
+			// If count inconsistencies are found, reset database and fetch everything
 			DataService.shared.deleteAll()
 			pokemonList.removeAll()
 			speciesList.removeAll()
@@ -218,14 +232,17 @@ class PokedexManager {
 			fetchPokemon(fromNumber: offset, toNumber: limit)
 			
 			speciesFetchCounter = limit-offset
-			
 			var lowerBound = offset
-			if lowerBound == 0 { lowerBound = 1 }
+			if lowerBound == 0 { lowerBound = 1 } // Since there is no #000 pokemon, a workaround is needed
 			for i in lowerBound...limit {
 				fetchSpecies(byNumber: i)
 			}
-			
-		} else {
+		
+		}
+		// There was data stored in the database
+		else {
+			print("No need to fetch from API")
+			pokemonKeys = Array(pokemonList.keys.sorted())
 			delegate?.didFinishFetchingPokemon(self)
 			delegate?.didFinishFetchingSpecies(self)
 		}
@@ -236,18 +253,16 @@ class PokedexManager {
 	- Parameter purgeDatabase: Invokes the deleteAll method from DataService to reset the database.
 	*/
 	func resetData(purgeDatabase: Bool = false){
+		pokemonKeys.removeAll()
 		pokemonList.removeAll()
 		finishedFetchingPokemon = false
+		
 		speciesList.removeAll()
 		finishedFetchingSpecies = false
-		
 		
 		if purgeDatabase {
 			DataService.shared.deleteAll()
 		}
-		
-		// REVIEW
-		self.delegate?.didFinishFetchingPokemon(self)
 	}
 }
 

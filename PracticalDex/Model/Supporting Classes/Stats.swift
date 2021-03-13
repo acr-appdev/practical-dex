@@ -19,7 +19,7 @@ struct Stats {
 	}
 }
 
-/// Stores the base stats for a given pokémon, ranging from
+/// Stores the base stats for a given pokémon
 struct BaseStats {
 	let hp: Int
 	let atk: Int

@@ -25,3 +25,4 @@ final class LocalizedNameObject: Object {
 	@objc dynamic var name: String = ""
 	@objc dynamic var language: String = ""
 }
+

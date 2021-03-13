@@ -30,6 +30,9 @@ class SettingsDetailViewController: UIViewController {
 		tableView.delegate = self
 		tableView.dataSource = self
 		tableView.rowHeight = 60
+		tableView.backgroundColor = K.Design.Color.blue
+		tableView.separatorColor = K.Design.Color.white
+		tableView.separatorInset = .zero
 		
 		tableView.register(SimpleCell.self, forCellReuseIdentifier: reuseId)
 		view.addSubview(tableView)
@@ -55,7 +58,9 @@ extension SettingsDetailViewController: UITableViewDelegate, UITableViewDataSour
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: reuseId) as! SimpleCell
+		cell.backgroundColor = K.Design.Color.blue
 		cell.label.text = contents[indexPath.row]
+		cell.label.textColor = K.Design.Color.white
 		return cell
 	}
 	

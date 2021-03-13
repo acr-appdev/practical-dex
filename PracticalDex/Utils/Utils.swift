@@ -61,7 +61,7 @@ func fetchData<T: Decodable>(urlString: String, completion: @escaping (Result<T,
 	}.resume()
 }
 
-//MARK: - Utility Functions
+//MARK: - Utility Functions + Extensions
 func setUserDefaults() {
 	let ud = UserDefaults.standard
 	ud.set(true, forKey: K.App.Defaults.hasLaunchedBefore)
@@ -80,7 +80,7 @@ func setUserDefaults() {
 	ud.set(Language.en.rawValue, forKey: K.App.Defaults.selectedLanguage)
 }
 
-//MARK: - UIView Extension
+//MARK: - UIView
 extension UIView {
 	func pin(to view: UIView){
 		self.translatesAutoresizingMaskIntoConstraints = false
@@ -124,7 +124,7 @@ extension UIView {
 	}
 }
 
-// MARK: - UILabel Extensions
+// MARK: - UILabel
 extension UILabel {
 	func roundedEdges(withSize size: CGFloat? = nil, mask: CACornerMask? = nil){
 		self.clipsToBounds = true
@@ -133,12 +133,51 @@ extension UILabel {
 	}
 }
 
+// MARK: - UIFont
 extension UIFont {
 	func toggleBold(isBold: Bool) -> UIFont {
 		if isBold {
 			return UIFont.systemFont(ofSize: self.pointSize)
 		} else {
 			return UIFont.boldSystemFont(ofSize: self.pointSize)
+		}
+	}
+}
+
+// MARK: - Measurement
+extension Measurement where UnitType == UnitLength {
+	
+	// Example format extension
+	private static let usFormatted: MeasurementFormatter = {
+	   let formatter = MeasurementFormatter()
+		formatter.locale = Locale(identifier: "en_US")
+		formatter.unitOptions = .providedUnit
+		formatter.numberFormatter.maximumFractionDigits = 0
+		formatter.unitStyle = .long
+		return formatter
+	}()
+	
+	var usFormatted: String { Measurement.usFormatted.string(from: self) }
+}
+
+//MARK: - UISearchBar
+extension UISearchBar {
+	// Code from https://betterprogramming.pub/how-to-change-the-placeholder-color-in-a-uisearchbar-1f47e5266e10
+	public var textField: UITextField? {
+		if #available(iOS 13, *){
+			return searchTextField
+		}
+		let subViews = subviews.flatMap { $0.subviews }
+		guard let textField = (subViews.filter{ $0 is UITextField }).first as? UITextField else { return nil }
+		
+		return textField
+	}
+	
+	func changePlaceholderTextColor(to color: UIColor){
+		guard let UISearchBarTextFieldLabel: AnyClass = NSClassFromString("UISearchBarTextFieldLabel"),
+			  let field = textField else { return }
+		for subview in field.subviews where subview.isKind(of: UISearchBarTextFieldLabel) {
+			(subview as! UILabel).textColor = color
 		}
 	}
 }

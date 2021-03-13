@@ -35,7 +35,8 @@ class SettingsViewController: UIViewController, SettingsCellDelegate {
 		navigationController?.navigationBar.prefersLargeTitles = true
 		navigationController?.navigationBar.isTranslucent = false
 		navigationController?.navigationBar.barStyle = .black
-		navigationController?.navigationBar.barTintColor = UIColor(red: 55/255, green: 120/255, blue: 250/255, alpha: 1)
+		navigationController?.navigationBar.backgroundColor = K.Design.Color.blue
+		navigationController?.navigationBar.tintColor = K.Design.Color.white
 		
 		navigationItem.title = "Settings"
 	}
@@ -45,6 +46,9 @@ class SettingsViewController: UIViewController, SettingsCellDelegate {
 		tableView.delegate = self
 		tableView.dataSource = self
 		tableView.rowHeight = 60
+		tableView.backgroundColor = K.Design.Color.blue
+		tableView.separatorColor = K.Design.Color.white
+		tableView.separatorInset = .init(top: 0, left: 0, bottom: 0, right: 0)
 		
 		tableView.register(SettingsCell.self, forCellReuseIdentifier: K.App.View.Cell.settings)
 		view.addSubview(tableView)
@@ -75,11 +79,11 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 	// MARK: - viewForHeaderInSection
 	func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 		let view = UIView()
-		view.backgroundColor = K.Design.Color.menuLightBlue
+		view.backgroundColor = K.Design.Color.darkBlue
 		
 		let title = UILabel()
-		title.font = .boldSystemFont(ofSize: 16)
-		title.textColor = .white
+		title.font = .boldSystemFont(ofSize: 20)
+		title.textColor = K.Design.Color.white
 		title.text = SettingsSection(rawValue: section)?.description
 		view.addSubview(title)
 		
@@ -101,28 +105,36 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 		guard let section = SettingsSection(rawValue: indexPath.section) else { return UITableViewCell() }
 		
 		cell.selectionStyle = .none
+		cell.backgroundColor = K.Design.Color.blue
+		cell.textLabel?.font = .boldSystemFont(ofSize: (cell.textLabel?.font.pointSize)!)
+		cell.textLabel?.textColor = K.Design.Color.white
 		
 		switch section {
 			case .GeneralSettings: // first section
 				let generalOptions = GeneralSettings(rawValue: indexPath.row)
 				cell.textLabel?.text = generalOptions?.description
 				cell.sectionType = generalOptions
+				
 				// tags are used to identify which cell's accessory received an action in the action handler, implemented in the settingscell class
 				cell.switchControl.tag = generalOptions?.rawValue ?? -1
 				cell.sliderControl.tag = generalOptions?.rawValue ?? -1
 				
 				switch generalOptions {
 					case .resetData:
+						cell.switchControl.onTintColor = K.Design.Color.red
 						cell.delegate = self
 		
 					case .appVolume:
 						cell.sliderControl.value = defaults.float(forKey: K.App.Defaults.appVolume)
+						cell.sliderControl.tintColor = K.Design.Color.red
 						
 					case .backgroundMusic:
 						cell.labelControl.text = defaults.string(forKey: K.App.Defaults.selectedBGM)
+						cell.labelControl.textColor = K.Design.Color.red
 						
 					case .boxWallpaper:
 						cell.labelControl.text = defaults.string(forKey: K.App.Defaults.selectedWallpaper)
+						cell.labelControl.textColor = K.Design.Color.red
 						
 					default:
 						break
@@ -156,7 +168,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 						case .termsOfUse:
 							let vc = SettingsDetailViewController()
 							vc.title = AboutOptions.termsOfUse.description
-							vc.contents = ["These are the terms of use", "Blablabla"]
+							vc.contents = ["Check the terms of use on http://github.com/acr-appdev/practicaldex"]
 							navigationController?.pushViewController(vc, animated: true)
 							
 						case .version:
@@ -186,7 +198,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 				// Handle stuff when the user clicks any row in this section
 				let vc = SettingsDetailViewController()
 				vc.title = DeveloperOptions.name.description
-				vc.contents = ["@_allancrosa", "github.com/thisischu"]
+				vc.contents = ["@acr_appdev", "github.com/acr-appdev"]
 				navigationController?.pushViewController(vc, animated: true)
 			
 			// The default cell shouldn't be clickable

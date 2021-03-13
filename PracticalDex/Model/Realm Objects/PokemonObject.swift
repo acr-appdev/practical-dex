@@ -55,12 +55,18 @@ final class PokemonObject: Object {
 		height = pokemon.height.converted(to: .meters).value
 		weight = pokemon.weight.converted(to: .kilograms).value
 		
-		ability1 = pokemon.abilities[1]?.name ?? ""
-		ability1_isHidden = ((pokemon.abilities[1]?.isHidden) != nil)
-		ability2 = pokemon.abilities[2]?.name ?? ""
-		ability2_isHidden = ((pokemon.abilities[2]?.isHidden) != nil)
-		ability3 = pokemon.abilities[3]?.name ?? ""
-		ability3_isHidden = ((pokemon.abilities[3]?.isHidden) != nil)
+		if let ability = pokemon.abilities[1] {
+			ability1 = ability.name
+			ability1_isHidden = ability.isHidden
+		}
+		if let ability = pokemon.abilities[2] {
+			ability2 = ability.name
+			ability2_isHidden = ability.isHidden
+		}
+		if let ability = pokemon.abilities[3] {
+			ability3 = ability.name
+			ability3_isHidden = ability.isHidden
+		}
 
 		stat_hp  = pokemon.stats.base.hp
 		stat_atk = pokemon.stats.base.atk
