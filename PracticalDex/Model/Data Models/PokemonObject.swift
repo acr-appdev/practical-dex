@@ -38,7 +38,6 @@ final class PokemonObject: Object {
 	@objc dynamic var sprite_backShiny: String = ""
 	
 	let abilities = List<AbilityObject>()
-	@objc dynamic var species: SpeciesObject? = nil
 
 	override static func primaryKey() -> String? {
 		return "number"
