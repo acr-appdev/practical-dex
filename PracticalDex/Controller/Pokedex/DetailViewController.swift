@@ -99,7 +99,6 @@ class DetailViewController: PokemonViewController {
 					ability1Label.layer.borderColor = borderColor
 					
 					if ability.isHidden {
-						print("Ability 1 is hidden")
 						ability1Label.font = UIFont.boldSystemFont(ofSize: ability1Label.font.pointSize)
 					} else {
 						ability1Label.font = UIFont.systemFont(ofSize: ability1Label.font.pointSize)
@@ -114,7 +113,6 @@ class DetailViewController: PokemonViewController {
 					ability2Label.isHidden = false
 					
 					if ability.isHidden {
-						print("Ability 2 is hidden")
 						ability2Label.font = UIFont.boldSystemFont(ofSize: ability2Label.font.pointSize)
 					} else {
 						ability2Label.font = UIFont.systemFont(ofSize: ability2Label.font.pointSize)
@@ -129,7 +127,6 @@ class DetailViewController: PokemonViewController {
 					ability3Label.isHidden = false
 					
 					if ability.isHidden {
-						print("Ability 3 is hidden")
 						ability3Label.font = UIFont.boldSystemFont(ofSize: ability3Label.font.pointSize)
 					} else {
 						ability3Label.font = UIFont.systemFont(ofSize: ability3Label.font.pointSize)

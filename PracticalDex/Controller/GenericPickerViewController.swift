@@ -19,13 +19,15 @@ class GenericPickerViewController: UIViewController, UIPickerViewDelegate, UIPic
 	var completionHandler:((String, Int) -> ())? // Handles the user's input on the UIPickerView
 	
 	var items: [[Any]] = [] // Initialize an array of items of type T
+	var backgroundColor: UIColor = .white
+	var textColor: UIColor = .lightGray
 	
 	// MARK: - Init
 	override func viewDidLoad(){
 		super.viewDidLoad()
 		
 		// Set up the viewController
-		view.backgroundColor = .white
+		view.backgroundColor = backgroundColor
 		
 		// Set up pickerView
 		pickerView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 150)
@@ -39,7 +41,7 @@ class GenericPickerViewController: UIViewController, UIPickerViewDelegate, UIPic
 		pickerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
 		pickerView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
 	}
-
+	
 	// MARK: - Functions
 	// MARK: Delegate & DataSource methods
 	func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
@@ -55,11 +57,19 @@ class GenericPickerViewController: UIViewController, UIPickerViewDelegate, UIPic
 	}
 	
 	func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-
+		
 		if let selectedItem = items[component][row] as? String {
 			print(selectedItem)
 			
 			completionHandler?(selectedItem, row)
 		}
+	}
+	
+	func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+		if let titleData = items[component][row] as? String {
+			let myTitle = NSAttributedString(string: titleData, attributes: [NSAttributedString.Key.foregroundColor: textColor])
+			return myTitle
+		}
+		return NSAttributedString(string: "", attributes: [NSAttributedString.Key.foregroundColor: textColor])
 	}
 }

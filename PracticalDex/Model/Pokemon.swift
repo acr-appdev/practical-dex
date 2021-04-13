@@ -166,6 +166,7 @@ extension Pokemon: Persistable {
 			abilities[2] = Ability(name: managedObject.ability3, isHidden: managedObject.ability3_isHidden, slot: 3)
 		}
 		
+		// TODO: - REVIEW PREDICATE
 		let matchNumberPredicate = NSPredicate(format: "number == \(number)")
 		self.species = nil
 		DataService.shared.retrieve(Species.self, predicate: matchNumberPredicate, completion: { (retrievedList) in

@@ -13,6 +13,7 @@ class PokedexViewController: UIViewController {
 	private var selectedPokemon = Pokemon()
 	private var pokedexManager = PokedexManager()
 	private var searchController = UISearchController(searchResultsController: nil)
+	private var lastSearch = ""
 	
 	@IBOutlet weak var collectionView: UICollectionView!
 	
@@ -72,13 +73,15 @@ class PokedexViewController: UIViewController {
 	
 	fileprivate func setupSearchBarTextField(){
 		searchController.searchBar.textField?.textColor = K.Design.Color.white
-		searchController.searchBar.changePlaceholderTextColor(to: K.Design.Color.white ?? .white)
+		searchController.searchBar.changePlaceholderTextColor(to: K.Design.Color.white)
+		searchController.searchBar.text = lastSearch
 	}
 }
 
 // MARK: - PokedexManagerDelegate
 extension PokedexViewController: PokedexManagerDelegate {
 	func didFinishFetchingSpecies(_ pokedexManager: PokedexManager) {
+		print("---- SPECIES DONE ----")
 		pokedexManager.updateFetchStatus(of: .Species)
 		pokedexManager.spcsGroup.notify(queue: .main, execute: {
 			self.pokedexManager.persist(speciesList: true)
@@ -86,6 +89,7 @@ extension PokedexViewController: PokedexManagerDelegate {
 	}
 	
 	func didFinishFetchingPokemon(_ pokedexManager: PokedexManager) {
+		print("---- POKEMON DONE ----")
 		pokedexManager.updateFetchStatus(of: .Pokemon)
 		pokedexManager.pkmnGroup.notify(queue: .main, execute: {
 			pokedexManager.persist(pokemonList: true)
@@ -128,7 +132,6 @@ extension PokedexViewController: UICollectionViewDelegate {
 		let pokemon = pokedexManager.pokemonList[number]
 
 		selectedPokemon = pokemon ?? Pokemon()
-		print("Clicked on indexPath: \(indexPath.row) \n Performing segue with \(selectedPokemon.number): \(selectedPokemon.name)")
 		
 		self.performSegue(withIdentifier: K.App.View.Segue.detailView, sender: self)
 	}
@@ -181,23 +184,28 @@ extension PokedexViewController: UISearchBarDelegate {
 	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
 		if (!(searchBar.text?.isEmpty)!) {
 			//print("Search for: \(searchBar.text!)")
+			lastSearch = searchBar.text!
 			pokedexManager.filter(searchBar.text!)
 		}
 		else {
+			lastSearch = ""
 			pokedexManager.restorePokemonList()
 		}
 	}
 	
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+		lastSearch = ""
 		pokedexManager.restorePokemonList()
 	}
 	
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		if (!(searchBar.text?.isEmpty)!) {
 			//print("Search for: \(searchBar.text!)")
-			pokedexManager.filter(searchBar.text!)
+			lastSearch = searchBar.text!
+			pokedexManager.filter(lastSearch)
 		}
 		else {
+			lastSearch = ""
 			pokedexManager.restorePokemonList()
 		}
 	}

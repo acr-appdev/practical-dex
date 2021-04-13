@@ -13,10 +13,10 @@ struct K {
 	struct Design {
 		struct Color {
 			static let menuLightBlue = UIColor(red: 55/255, green: 120/255, blue: 250/255, alpha: 1)
-			static let red = UIColor(named: "theme-red")
-			static let blue = UIColor(named: "theme-blue")
-			static let darkBlue = UIColor(named: "theme-darkblue")
-			static let white = UIColor(named: "theme-white")
+			static let red = UIColor(named: "theme-red") ?? #colorLiteral(red: 0.900775373, green: 0.2945650816, blue: 0.2367742062, alpha: 1)
+			static let blue = UIColor(named: "theme-blue") ?? #colorLiteral(red: 0.1739603281, green: 0.2390800714, blue: 0.3204770088, alpha: 1)
+			static let darkBlue = UIColor(named: "theme-darkblue") ?? #colorLiteral(red: 0.1028242931, green: 0.1450264752, blue: 0.1898280084, alpha: 1)
+			static let white = UIColor(named: "theme-white") ?? #colorLiteral(red: 0.9217720628, green: 0.9412187338, blue: 0.9451423287, alpha: 1)
 		}
 		struct Image {
 			static let pkmnSpritePlaceholder = "placeholder-missingno"

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -154,7 +154,7 @@
 			isa = PBXGroup;
 			children = (
 				ACE4654224CBA8BA0063A02C /* API Models */,
-				AC66E37A24D1374C00B47555 /* Realm Objects */,
+				AC66E37A24D1374C00B47555 /* Data Models */,
 				ACFD2CE6257FEBA900BB87EB /* Supporting Classes */,
 				AC03EEE024BA5912002DE350 /* Pokemon.swift */,
 				ACF9F30924CE60A8004B0BB0 /* Species.swift */,
@@ -198,17 +198,17 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		AC66E37A24D1374C00B47555 /* Realm Objects */ = {
+		AC66E37A24D1374C00B47555 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
 				AC502BCC24D37D20008EA626 /* DataService.swift */,
+				ACB4FE8C24EDC04B00D75CA2 /* Persistable.swift */,
 				ACA81B6124D31BC3009D380D /* PokemonObject.swift */,
 				AC502BCA24D32102008EA626 /* SpeciesObject.swift */,
 				AC5C16D524FE8ACD00D19F25 /* AbilityObject.swift */,
-				ACB4FE8C24EDC04B00D75CA2 /* Persistable.swift */,
 				AC035C2A2593FF0900CC096D /* PokemonDataTextObjects.swift */,
 			);
-			path = "Realm Objects";
+			path = "Data Models";
 			sourceTree = "<group>";
 		};
 		AC9AFE1924B903E600884D6D = {
@@ -345,7 +345,7 @@
 				};
 			};
 			buildConfigurationList = AC9AFE1D24B903E600884D6D /* Build configuration list for PBXProject "PracticalDex" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 11.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -541,7 +541,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -596,7 +596,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

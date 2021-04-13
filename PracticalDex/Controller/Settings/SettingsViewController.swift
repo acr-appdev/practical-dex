@@ -237,13 +237,15 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 	
 	// MARK: -- Helper Functions --
 	
-	func presentBoxWallpaperView() {
+	fileprivate func presentBoxWallpaperView() {
 		let previousWallpaper = defaults.string(forKey: K.App.Defaults.selectedWallpaper)
 		let selectedWallpaperIndex = defaults.integer(forKey: K.App.Defaults.selectedWallpaperIndex)
 		
 		let vc = GenericPickerViewController()
 		vc.title = GeneralSettings.boxWallpaper.description
 		vc.items = [K.App.wallpaperList]
+		vc.backgroundColor = K.Design.Color.darkBlue
+		vc.textColor = K.Design.Color.white
 		
 		// An attribute is used to set the default index because at this point we don't have the pickerView's delegate assigned
 		vc.presetRowIndex = selectedWallpaperIndex
@@ -255,7 +257,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 			
 			if selectedItem != previousWallpaper {
 				self.settingsDelegate?.dataNeedsReloading()
-				self.tableView.reloadData()
+				self.tableView.reloadData() // update the settings page with the new value
 			}
 		}
 		// Present our newly created view controller
@@ -263,13 +265,15 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 	}
 	
 	// MARK: presentBGMView
-	func presentBGMView(){
+	fileprivate func presentBGMView(){
 		let previousBGM = UserDefaults.standard.string(forKey: K.App.Defaults.selectedBGM)
 		let selectedBGMIndex = UserDefaults.standard.integer(forKey: K.App.Defaults.selectedBGMIndex)
 		
 		let vc = GenericPickerViewController()
 		vc.title = GeneralSettings.backgroundMusic.description
 		vc.items = [K.App.bgmList]
+		vc.backgroundColor = K.Design.Color.darkBlue
+		vc.textColor = K.Design.Color.white
 		
 		// An attribute is used to set the default index because at this point we don't have the pickerView's delegate assigned
 		vc.presetRowIndex = selectedBGMIndex
@@ -281,7 +285,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 			
 			if selectedItem != previousBGM {
 				playBGM(sound: selectedItem, type: "mp3")
-				self.tableView.reloadData()
+				self.tableView.reloadData() // Update the settings page tableview with the new selected value
 			}
 		}
 		// Present our newly created view controller

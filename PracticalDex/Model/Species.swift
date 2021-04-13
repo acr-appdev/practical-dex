@@ -79,7 +79,7 @@ struct Species {
 			// TODO: Handle Nil coalescing
 			let lang = Language(rawValue: element.language.name) ?? .en
 			let gameVer = GameVersion(rawValue: element.version.name) ?? .red
-			let text = element.flavor_text.trimmingCharacters(in: .newlines)
+			let text = element.flavor_text.components(separatedBy: .whitespacesAndNewlines).joined(separator: " ")
 			let newTextEntry = FlavorTextEntry(flavorTextDescription: text, language: lang, version: gameVer)
 			
 			newTextEntries[lang] = newTextEntry
@@ -89,8 +89,9 @@ struct Species {
 		var newEggGroups: [EggGroup] = []
 		speciesData.egg_groups.forEach { (element) in
 			let name = element.name
-			let eggGroup = EggGroup(rawValue: name)
-			newEggGroups.append(eggGroup ?? .undiscovered)
+			let eggGroup = EggGroup(name)
+			//print("\(speciesData.name) -> \(name) \(eggGroup)")
+			newEggGroups.append(eggGroup)
 		}
 		eggGroups = newEggGroups
 	}
@@ -105,7 +106,6 @@ extension Species: Persistable {
 		genderRate = managedObject.genderRate
 		
 		var newGenera: [Language : Genus] = [:]
-		// let retrievedGenera = managedObject.getGenera()
 		let retrievedGenera = managedObject.generaAsArray
 		retrievedGenera.forEach { (genus) in
 			newGenera[genus.language] = genus
@@ -119,14 +119,19 @@ extension Species: Persistable {
 		}
 		flavorTextEntries = newTextEntries
 		
-		eggGroups = Array(_immutableCocoaArray: managedObject.eggGroups)
+		// Extra steps required to convert Strings stored in database to Enum
+		let groups: [String] = managedObject.eggGroups.toArray()
+		var newGroup: [EggGroup] = []
+		groups.forEach({
+			let newEggGroup = EggGroup($0)
+			newGroup.append(newEggGroup)
+		})
+		eggGroups = newGroup
+		
 		//		baseHappiness = managedObject.baseHappiness
 		//		captureRate = managedObject.captureRate
 		//		color = UIColor.black
-		//		eggGroups = []
 		//		generation = .i
-		
-		//		eggGroups = managedObject.eggGroups
 		//		generation = managedObject.generation
 		
 		//		growthRate = managedObject.growthRate
@@ -145,7 +150,7 @@ extension Species: Persistable {
 		speciesObject.name = name
 		speciesObject.genderRate = genderRate ?? -1
 		
-		genera.forEach { (lang, genus) in
+		self.genera.forEach { (lang, genus) in
 			let newGenus = GenusObject()
 			newGenus.genusDescription = genus.genusDescription
 			newGenus.language = lang.rawValue
@@ -153,7 +158,7 @@ extension Species: Persistable {
 			speciesObject.genera.append(newGenus)
 		}
 		
-		flavorTextEntries.forEach { (lang, textEntry) in
+		self.flavorTextEntries.forEach { (lang, textEntry) in
 			let newTextEntry = FlavorTextEntryObject()
 			newTextEntry.flavorTextDescription = textEntry.flavorTextDescription
 			newTextEntry.language = lang.rawValue
@@ -162,16 +167,9 @@ extension Species: Persistable {
 			speciesObject.flavorTextEntries.append(newTextEntry)
 		}
 		
-		//		speciesObject.baseHappiness = baseHappiness
-		//		speciesObject.captureRate = captureRate
-		//		speciesObject.color = color
-		//		speciesObject.eggGroups = eggGroups
-		//		speciesObject.generation = generation
-		//		speciesObject.growthRate = growthRate
-		//		speciesObject.hasGenderDifferences = hasGenderDifferences
-		//		speciesObject.hatchCounter = hatchCounter
-		//		speciesObject.isBaby = isBaby
-		//		speciesObject.names = names
+		self.eggGroups.forEach { (eggGroup) in
+			speciesObject.eggGroups.append(eggGroup.description.lowercased().trimmingCharacters(in: .whitespaces))
+		}
 		
 		return speciesObject
 	}

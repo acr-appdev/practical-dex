@@ -31,7 +31,7 @@ class PokedexManager {
 	private var pokemonFetchCounter = 0
 	var finishedFetchingPokemon = false
 	
-	var speciesList: [Species] = []
+	var speciesList: [Int : Species] = [:]
 	let spcsGroup = DispatchGroup()
 	private var speciesFetchCounter = 0
 	var finishedFetchingSpecies = false
@@ -42,15 +42,21 @@ class PokedexManager {
 	func persist(pokemonList savePokemonList: Bool = false, speciesList saveSpeciesList: Bool = false) {
 		if savePokemonList {
 			// Discarding the dictionary key value to store only the relevant data
+			//print("=== Saving Pokémon === \n")
+			//			pokemonList.forEach { (key, value) in
+			//				let numberString = String(format: "%03d", key)
+			//				print("Pokemon: \(numberString) \(value.name) ")
+			//			}
 			let lazyMapCollection = pokemonList.values
 			let pkmnArray = Array(lazyMapCollection)
-			print("saving pokemon")
 			DataService.shared.create(pkmnArray)
 		}
 		
 		if saveSpeciesList {
-			print("saving species")
-			DataService.shared.create(speciesList)
+			//print("saving species")
+			let lazyMapCollection = speciesList.values
+			let speciesArray = Array(lazyMapCollection)
+			DataService.shared.create(speciesArray)
 		}
 	}
 	
@@ -59,16 +65,14 @@ class PokedexManager {
 	func filter(_ string: String){
 		// treat string to convert it to nspredicate
 		let predicate = NSPredicate(format: "name CONTAINS[cd] %@", string)
-		print("SEARCH FOR: \(string)")
+		
 		pokemonKeys.removeAll()
 		DataService.shared.retrieve(Pokemon.self, predicate: predicate, sorted: nil) { (retrievedData) in
 			retrievedData.forEach { (pkmn) in
 				pokemonKeys.append(pkmn.number)
-				print(pkmn.name)
 			}
 		}
 		pokemonKeys.sort()
-		print("- END OF SEARCH RESULTS - ")
 		delegate?.didUpdatePokedexData(self)
 	}
 	
@@ -92,6 +96,7 @@ class PokedexManager {
 					self.pkmnGroup.enter()
 					self.pokemonFetchCounter = data.results.count
 					data.results.forEach({ pkmn in
+						
 						self.pkmnGroup.enter()
 						self.fetchPokemon(byName: pkmn.name, batch: true)
 					})
@@ -109,13 +114,13 @@ class PokedexManager {
 	/// - Parameter batch: Indicates if caller is in a batched fetch call.
 	private func fetchPokemon(byName name: String, batch: Bool = false){
 		let urlString = "https://pokeapi.co/api/v2/pokemon/\(name)"
-
+		
 		fetchData(urlString: urlString) { [self] (result: Result<PokemonData, Error>) in
 			switch result {
 				case .success(let pkmnData):
 					let pkmn = Pokemon(withData: pkmnData)
 					self.pokemonList[pkmn.number] = pkmn
-					
+					self.pokemonKeys = Array(self.pokemonList.keys.sorted())
 					// This line lets the data be updated as it is retrieved
 					self.delegate?.didUpdatePokedexData(self)
 					
@@ -161,9 +166,8 @@ class PokedexManager {
 		fetchData(urlString: urlString){ (result: Result<PokemonSpeciesData, Error>) in
 			switch result {
 				case .success(let pkmnData):
-					let specie = Species(withData: pkmnData)
-					self.speciesList.append(specie)
-				
+					let species = Species(withData: pkmnData)
+					self.speciesList[species.number] = species
 				case .failure(let error):
 					print("Failed to fetch species by number (\(id ?? -1)): ", error)
 					self.delegate?.didFailWithError(error)
@@ -181,14 +185,17 @@ class PokedexManager {
 	*/
 	func updateFetchStatus(of fetchable: PokedexManagerFetchable){
 		switch fetchable {
-			case .Pokemon: finishedFetchingPokemon = true
-			case .Species: finishedFetchingSpecies = true
+			case .Pokemon:
+				finishedFetchingPokemon = true
+			case .Species:
+				finishedFetchingSpecies = true
 		}
 		
 		if finishedFetchingPokemon && finishedFetchingSpecies {
 			pokemonList.forEach { (key, pokemon) in
 				//speciesList is an array, which is zero indexed
-				pokemonList[key]?.species = speciesList[key-1]
+				//print("Key: \(key) Species: \(speciesList[key]?.name) Pkmn: \(pokemonList[key]?.name)")
+				pokemonList[key]?.species = speciesList[key]
 			}
 		}
 	}
@@ -218,33 +225,42 @@ class PokedexManager {
 		}
 		
 		DataService.shared.retrieve(Species.self, sorted: sortParameter) { (retrievedList) in
-			self.speciesList = retrievedList
+			retrievedList.forEach { (species) in
+				self.speciesList[species.number] = species
+			}
 		}
+		
+		pokemonKeys = Array(pokemonList.keys.sorted())
 		
 		// Check if the pokemonList.count is the correct amount of pokemon
 		let check = limit-offset
 		if self.pokemonList.count != check || self.speciesList.count != check {
-			// If count inconsistencies are found, reset database and fetch everything
-			DataService.shared.deleteAll()
-			pokemonList.removeAll()
-			speciesList.removeAll()
 			
-			fetchPokemon(fromNumber: offset, toNumber: limit)
+			var fetchRangeLowerBound = offset
+			if offset == 0 { fetchRangeLowerBound = 1 } // There is no pokemon numbered as 0
+			let fetchRange = Set(fetchRangeLowerBound...limit)
 			
-			speciesFetchCounter = limit-offset
-			var lowerBound = offset
-			if lowerBound == 0 { lowerBound = 1 } // Since there is no #000 pokemon, a workaround is needed
-			for i in lowerBound...limit {
-				fetchSpecies(byNumber: i)
-			}
-		
+			// Sometimes there are PokeAPI entries that doesn't return valid JSON, even when they should.
+			// In order to deal with that, we might need to try to fetch entries that didn't receive an answer after the app's first launch call to populatePokedex
+			let notFetchedEntries = fetchRange.subtracting(pokemonKeys)
+			
+			pkmnGroup.enter() // Batching fetchPokemon
+			notFetchedEntries.forEach({
+				self.pkmnGroup.enter()
+				self.pokemonFetchCounter = notFetchedEntries.count
+				fetchPokemon(byName: String($0), batch: true)
+				
+				self.speciesFetchCounter = notFetchedEntries.count
+				fetchSpecies(byNumber: $0)
+			})
+			
 		}
-		// There was data stored in the database
+		// There was correct data stored in the database
 		else {
 			print("No need to fetch from API")
-			pokemonKeys = Array(pokemonList.keys.sorted())
-			delegate?.didFinishFetchingPokemon(self)
-			delegate?.didFinishFetchingSpecies(self)
+			pokemonKeys.forEach { (key) in
+				pokemonList[key]?.species = speciesList[key]
+			}
 		}
 	}
 	

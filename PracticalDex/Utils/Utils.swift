@@ -181,3 +181,10 @@ extension UISearchBar {
 		}
 	}
 }
+
+//MARK: - RealmCollection
+extension RealmCollection {
+	func toArray<T>() -> [T] {
+		return self.compactMap{$0 as? T}
+	}
+}

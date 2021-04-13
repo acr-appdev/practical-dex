@@ -29,8 +29,8 @@ enum Type: Int, CaseIterable, CustomStringConvertible {
 	case dark
 	case steel
 	case fairy
-	case none // Renamed to none
-	case shadow // Probably unused
+	case none // Type ??? renamed to none
+	case shadow // Probably unused, existed in Colosseum
 	
 	init(_ value: String){
 		switch value.lowercased() {
@@ -84,8 +84,8 @@ enum Type: Int, CaseIterable, CustomStringConvertible {
 }
 
 // MARK: - Enum EggGroup
-/// String value taken from https://pokeapi.co/api/v2/egg-group/
-enum EggGroup: String {
+/// String values taken from https://pokeapi.co/api/v2/egg-group/
+enum EggGroup: Int, CaseIterable, CustomStringConvertible {
 	case monster
 	case water1
 	case water2
@@ -93,14 +93,62 @@ enum EggGroup: String {
 	case bug
 	case mineral
 	case flying
-	case field
+	case field // Ground in Stadium2
 	case fairy
 	case ditto
 	case dragon
-	case amorphous = "indeterminate" // Renamed to conform to bulbapedia
-	case grass = "plant" // Renamed to conform to bulbapedia
-	case humanlike = "humanshape" // Renamed to conform to bulbapedia
-	case undiscovered = "no-eggs" // Renamed to conform to bulbapedia
+	case amorphous // Indeterminate in Stadium2
+	case grass // Plant in Stadium2
+	case humanlike // Humanshape in Stadium2
+	case undiscovered // No-Eggs in Stadium2
+	case error // To handle errors
+	
+	init(_ value: String){
+		switch value.lowercased() {
+			case "monster": self = .monster
+			case "water1": self = .water1
+			case "water2": self = .water2
+			case "water3": self = .water3
+			case "bug": self = .bug
+			case "mineral": self = . mineral
+			case "flying": self = .flying
+			case "field": self = .field
+			case "ground": self = .field
+			case "fairy": self = .fairy
+			case "ditto": self = .ditto
+			case "dragon": self = .dragon
+			case "amorphous": self = .amorphous
+			case "indeterminate": self = .amorphous
+			case "grass": self = .grass
+			case "plant": self = .grass
+			case "humanlike": self = .humanlike
+			case "humanshape": self = .humanlike
+			case "undiscovered": self = .undiscovered
+			case "no-eggs": self = .undiscovered
+			default: self = .error
+		}
+	}
+	
+	var description: String {
+		switch self {
+			case .monster: return "Monster"
+			case .water1: return "Water 1"
+			case .water2: return "Water 2"
+			case .water3: return "Water 3"
+			case .bug: return "Bug"
+			case .mineral: return "Mineral"
+			case .flying: return "Flying"
+			case .field: return "Field"
+			case .fairy: return "Fairy"
+			case .ditto: return "Ditto"
+			case .dragon: return "Dragon"
+			case .amorphous: return "Amorphous"
+			case .grass: return "Grass"
+			case .humanlike: return "Humanlike"
+			case .undiscovered: return "Undiscovered"
+			case .error: return "ERROR"
+		}
+	}
 }
 
 // MARK: - Enum GameVersion
