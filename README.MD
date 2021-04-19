@@ -17,7 +17,7 @@
 			- The use of RealmSwift also serves as a good practice to keep code working with the ever evolving external libraries. CocoaPods is used to keep RealmSwift updated.
 		- Develop a Settings page that can be reused for any app, which can be expanded with ease if needed. It includes features such as customizable background music, in order to explore possible features unrelated to the main app objective.
 <p align="center">
-<img src= "PractDexPreview.mp4" width="300" >
+<img src= "https://imgur.com/a/OjHIvOU" width="300" >
 </p>
 
 
@@ -65,11 +65,15 @@
 
 Project is closed for contributions but suggestions are welcome.
 
-## Meta
+## Contact 
 
-Allan C. Rosa – [@allanrosa_dev](https://twitter.com/allanrosa_dev – allan.rosa.dev@gmail.com
+Allan C. Rosa – [@allanrosa_dev](https://twitter.com/allanrosa_dev)
+[https://github.com/acr-appdev/](https://github.com/acr-appdev/) 
 
-[https://github.com/acr-appdev/practical-dex](https://github.com/acr-appdev/)
+## Credits
+
+BGM by Eric Matyas
+www.soundimage.org
 
 [swift-image]:https://img.shields.io/badge/swift-5.0-orange.svg
 [swift-url]: https://swift.org/
