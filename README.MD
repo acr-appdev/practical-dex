@@ -17,7 +17,7 @@
 			- The use of RealmSwift also serves as a good practice to keep code working with the ever evolving external libraries. CocoaPods is used to keep RealmSwift updated.
 		- Develop a Settings page that can be reused for any app, which can be expanded with ease if needed. It includes features such as customizable background music, in order to explore possible features unrelated to the main app objective.
 <p align="center">
-<img src= "https://imgur.com/a/OjHIvOU" width="300" >
+<img src= "https://i.imgur.com/pqqYVuF.mp4" width="300" >
 </p>
 
 
