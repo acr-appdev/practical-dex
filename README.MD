@@ -17,8 +17,9 @@
 			- The use of RealmSwift also serves as a good practice to keep code working with the ever evolving external libraries. CocoaPods is used to keep RealmSwift updated.
 		- Develop a Settings page that can be reused for any app, which can be expanded with ease if needed. It includes features such as customizable background music, in order to explore possible features unrelated to the main app objective.
 <p align="center">
-<img src= "https://media.giphy.com/media/HYOlBKJBqgAfe/giphy.gif" width="400" >
+<img src= "PractDexPreview.mp4" width="300" >
 </p>
+
 
 ## Features
 
@@ -39,7 +40,7 @@
 
     ```bash
    git clone https://github.com/acr-appdev/practical-dex.git
-    ```
+   ```
 
 2. Install pod dependencies:
 
@@ -66,9 +67,7 @@ Project is closed for contributions but suggestions are welcome.
 
 ## Meta
 
-Allan C. Rosa – [@acr_appdev](https://twitter.com/acr_appdev) – acr.appdeveloper@gmail.com
-
-
+Allan C. Rosa – [@allanrosa_dev](https://twitter.com/allanrosa_dev – allan.rosa.dev@gmail.com
 
 [https://github.com/acr-appdev/practical-dex](https://github.com/acr-appdev/)
 
