@@ -21,7 +21,7 @@ protocol SectionType: CustomStringConvertible {
 enum SettingsSection: Int, CaseIterable, CustomStringConvertible  {
 	case GeneralSettings
 	case About
-	case Developer
+	case Credits
 	
 	var description: String {
 		switch self {
@@ -29,8 +29,8 @@ enum SettingsSection: Int, CaseIterable, CustomStringConvertible  {
 				return "General"
 			case .About:
 				return "About"
-			case .Developer:
-				return "Developer"
+			case .Credits:
+				return "Credits"
 		}
 	}
 }
@@ -111,8 +111,9 @@ enum AboutOptions: Int, CaseIterable, SectionType {
 	}
 }
 
-enum DeveloperOptions: Int, CaseIterable, SectionType {
-	case name
+enum CreditsOptions: Int, CaseIterable, SectionType {
+	case allanRosa
+	case ericMatyas
 	// case contact
 	// case github
 	
@@ -136,7 +137,8 @@ enum DeveloperOptions: Int, CaseIterable, SectionType {
 	
 	var description: String {
 		switch self {
-			case .name: return "Allan Clipes Rosa"
+			case .allanRosa: return "Allan C. Rosa - Development"
+			case .ericMatyas: return "Eric Matyas - Music"
 		//	case .contact: return "allanccrosa@gmail.com"
 		//	case .github: return "github.com/allanccrosa"
 		}

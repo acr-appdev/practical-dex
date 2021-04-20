@@ -145,6 +145,7 @@
 				AC9AFE2D24B903E700884D6D /* Main.storyboard */,
 				ACB25FF824BCCA940006E634 /* PokedexCell.swift */,
 				AC54803D250BBC28006554ED /* SettingsCell.swift */,
+				AC54F19E2511582D00F41F6F /* SettingsSection.swift */,
 				AC8274472528C5110098B829 /* SimpleCell.swift */,
 			);
 			path = View;
@@ -160,7 +161,6 @@
 				ACF9F30924CE60A8004B0BB0 /* Species.swift */,
 				AC5C16D324FE895900D19F25 /* Ability.swift */,
 				AC03EEE624BA7437002DE350 /* PokedexManager.swift */,
-				AC54F19E2511582D00F41F6F /* SettingsSection.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";

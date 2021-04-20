@@ -29,7 +29,7 @@ class SettingsViewController: UIViewController, SettingsCellDelegate {
 	// MARK: --Helper Functions--
 	func configureUI(){
 		configureTableView()
-				
+		
 		navigationController?.modalPresentationStyle = .fullScreen
 		navigationController?.modalTransitionStyle = .partialCurl
 		navigationController?.navigationBar.prefersLargeTitles = true
@@ -71,8 +71,8 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 				return GeneralSettings.allCases.count
 			case .About: // second section
 				return AboutOptions.allCases.count
-			case .Developer:
-				return DeveloperOptions.allCases.count
+			case .Credits:
+				return CreditsOptions.allCases.count
 		}
 	}
 	
@@ -123,7 +123,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 					case .resetData:
 						cell.switchControl.onTintColor = K.Design.Color.red
 						cell.delegate = self
-		
+						
 					case .appVolume:
 						cell.sliderControl.value = defaults.float(forKey: K.App.Defaults.appVolume)
 						cell.sliderControl.tintColor = K.Design.Color.red
@@ -145,11 +145,11 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 				cell.textLabel?.text = aboutOptions?.description
 				cell.sectionType = aboutOptions
 				
-			case .Developer:
-				let developerOptions = DeveloperOptions(rawValue: indexPath.row)
-				cell.textLabel?.text = developerOptions?.description
+			case .Credits:
+				let creditsOptions = CreditsOptions(rawValue: indexPath.row)
+				cell.textLabel?.text = creditsOptions?.description
 				cell.accessoryType = .disclosureIndicator
-				cell.sectionType = developerOptions
+				cell.sectionType = creditsOptions
 		}
 		
 		return cell
@@ -168,13 +168,13 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 						case .termsOfUse:
 							let vc = SettingsDetailViewController()
 							vc.title = AboutOptions.termsOfUse.description
-							vc.contents = ["Check the terms of use on http://github.com/acr-appdev/practicaldex"]
+							vc.contents = ["Check the terms of use on http://github.com/allanrosa-dev/practical-dex"]
 							navigationController?.pushViewController(vc, animated: true)
 							
 						case .version:
 							let vc = SettingsDetailViewController()
 							vc.title = AboutOptions.version.description
-							vc.contents = ["Version 1.0", "Change log"]
+							vc.contents = ["Version 1.0", "Change log (dummy)"]
 							navigationController?.pushViewController(vc, animated: true)
 					}
 				}
@@ -194,15 +194,23 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 					}
 				}
 				
-			case .Developer:
+			case .Credits:
 				// Handle stuff when the user clicks any row in this section
-				let vc = SettingsDetailViewController()
-				vc.title = DeveloperOptions.name.description
-				vc.contents = ["@acr_appdev", "github.com/acr-appdev"]
-				navigationController?.pushViewController(vc, animated: true)
-			
-			// The default cell shouldn't be clickable
-			// default: break
+				if let sectionSelected = CreditsOptions(rawValue: indexPath.row){
+					let vc = SettingsDetailViewController()
+					
+					switch sectionSelected {
+						case .allanRosa:
+							vc.title = CreditsOptions.allanRosa.description
+							vc.contents = ["@allanrosa_dev", "github.com/allanrosa-dev"]
+							
+						case .ericMatyas:
+							vc.title = CreditsOptions.ericMatyas.description
+							vc.contents = ["www.soundimage.org"]
+					}
+					
+					navigationController?.pushViewController(vc, animated: true)
+				}
 		}
 	}
 	
@@ -217,13 +225,13 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
 					let alert = UIAlertController(title: "Reset Pokédex Data?", message: "You will need an internet connection to download the data again.", preferredStyle: .alert)
 					
 					alert.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { action in
-
+						
 						self.settingsDelegate?.resetData()
 						sender.setOn(true, animated: true)
 					}))
 					
 					alert.addAction(UIAlertAction(title: "No", style: .default, handler: { action in
-
+						
 						sender.setOn(true, animated: true)
 					}))
 					
