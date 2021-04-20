@@ -3,7 +3,7 @@
 # Practical Dex
 
 <p align="center">
-  <a href="https://github.com/acr-appdev/practical-dex">
+  <a href="https://github.com/allan-rosa-dev/practical-dex">
 	<img src="practdex-icon.svg" alt="Logo" width="80" height="80">
   </a>
   <p align="center">
@@ -39,7 +39,7 @@
 1. Clone the repository:
 
     ```bash
-   git clone https://github.com/acr-appdev/practical-dex.git
+   git clone https://github.com/allan-rosa-dev/practical-dex.git
    ```
 
 2. Install pod dependencies:
@@ -68,7 +68,7 @@ Project is closed for contributions but suggestions are welcome.
 ## Contact 
 
 Allan C. Rosa – [@allanrosa_dev](https://twitter.com/allanrosa_dev)
-[https://github.com/acr-appdev/](https://github.com/acr-appdev/) 
+[https://github.com/allan-rosa-dev/](https://github.com/allan-rosa-dev/) 
 
 ## Credits
 
